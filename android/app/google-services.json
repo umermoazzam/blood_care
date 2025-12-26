@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "390742077782",
+    "project_id": "bloodcare-3aae3",
+    "storage_bucket": "bloodcare-3aae3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:390742077782:android:581708d0996cc3ec21e6f7",
+        "android_client_info": {
+          "package_name": "com.example.bloodcare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCUo70rODX2QHefMNVfJjBpjzs2a7bo1E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
