@@ -1,4 +1,3 @@
-// forgot_password_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -25,7 +24,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
-  // ✅ Toast dialog
   void _showToast(String message) {
     showDialog(
       context: context,
@@ -115,7 +113,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Back Button
                 InkWell(
                   onTap: () => Navigator.pop(context),
                   borderRadius: BorderRadius.circular(8),
@@ -125,8 +122,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-
-                // Title
                 Text(
                   'Forgot Password',
                   style: GoogleFonts.poppins(
@@ -136,8 +131,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-
-                // Subtitle
                 Text(
                   _otpSent
                       ? 'Enter the 4-digit code sent to your phone'
@@ -150,9 +143,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 40),
-
                 if (!_otpSent) ...[
-                  // Phone Number Input
                   Text('Phone Number',
                       style: GoogleFonts.poppins(
                           fontSize: 16,
@@ -177,8 +168,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Send OTP Button
                   SizedBox(
                     width: double.infinity,
                     height: 56,
@@ -204,7 +193,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                 ] else ...[
-                  // OTP Input Fields
                   Text('Enter Code',
                       style: GoogleFonts.poppins(
                           fontSize: 16,
@@ -247,8 +235,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     }),
                   ),
                   const SizedBox(height: 24),
-
-                  // Resend Code
                   Center(
                     child: TextButton(
                       onPressed: () {
@@ -264,8 +250,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Verify Button
                   SizedBox(
                     width: double.infinity,
                     height: 56,
@@ -291,10 +275,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                 ],
-
                 const SizedBox(height: 24),
-
-                // Back to Login
                 Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -314,8 +295,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 40),
-
-                // Info Card
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(

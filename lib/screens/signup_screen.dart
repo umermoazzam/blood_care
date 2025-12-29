@@ -69,7 +69,7 @@ class _SignupScreenState extends State<SignupScreen> {
     }
 
     widget.registeredUsers![phone] = password;
-    Navigator.pop(context, {phone: password}); // ✅ Only return on successful signup
+    Navigator.pop(context, {phone: password});
   }
 
   @override
@@ -120,8 +120,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 const SizedBox(height: 40),
-
-                // Name TextField
                 Text('Name', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 TextField(
@@ -138,8 +136,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Mobile Number TextField
                 Text('Mobile Number', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 TextField(
@@ -157,7 +153,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
                 Text('Password', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 TextField(
@@ -175,7 +170,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-
                 SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -193,7 +187,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -203,7 +196,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context); // ✅ Just go back, no message
+                        Navigator.pop(context);
                       },
                       child: Text(
                         'Login',

@@ -1,9 +1,8 @@
-// login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'signup_screen.dart';
 import 'home_screen.dart';
-import 'forgot_password_screen.dart'; // ✅ Forgot Password import
+import 'forgot_password_screen.dart';
 
 void main() {
   runApp(const BloodCareApp());
@@ -38,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final Map<String, String> registeredUsers = {};
 
-  bool _isHoveringForgot = false; // ✅ hover state for Forgot Password
+  bool _isHoveringForgot = false;
 
   void _showMessage(String message) {
     showDialog(
@@ -182,8 +181,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // ✅ Forgot Password with hover effect (color change only, no underline)
               Align(
                 alignment: Alignment.centerRight,
                 child: MouseRegion(
@@ -206,13 +203,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? const Color(0xFFFF5252)
                             : Colors.black,
                         fontWeight: FontWeight.w500,
-                        decoration: TextDecoration.none, // ❌ removed underline
+                        decoration: TextDecoration.none,
                       ),
                     ),
                   ),
                 ),
               ),
-
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
