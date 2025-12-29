@@ -23,14 +23,14 @@ class _SignupScreenState extends State<SignupScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         content: Row(
           children: [
-            const Icon(Icons.info_outline, color: Colors.black), // Black icon
+            const Icon(Icons.info_outline, color: Colors.black),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 message,
                 style: GoogleFonts.poppins(
                   fontSize: 14,
-                  color: Colors.black, 
+                  color: Colors.black,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -43,7 +43,7 @@ class _SignupScreenState extends State<SignupScreen> {
             child: Text(
               'OK',
               style: GoogleFonts.poppins(
-                color: Colors.black, 
+                color: Colors.black,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -69,7 +69,7 @@ class _SignupScreenState extends State<SignupScreen> {
     }
 
     widget.registeredUsers![phone] = password;
-    Navigator.pop(context, {phone: password});
+    Navigator.pop(context, {phone: password}); // ✅ Only return on successful signup
   }
 
   @override
@@ -203,7 +203,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pop(context); // ✅ Just go back, no message
                       },
                       child: Text(
                         'Login',

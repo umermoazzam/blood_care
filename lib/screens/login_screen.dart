@@ -1,11 +1,28 @@
-// login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-
 import 'signup_screen.dart';
 import 'home_screen.dart';
+
+void main() {
+  runApp(const BloodCareApp());
+}
+
+class BloodCareApp extends StatelessWidget {
+  const BloodCareApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Blood Care',
+      theme: ThemeData(
+        primarySwatch: Colors.red,
+        fontFamily: 'Inter',
+      ),
+      home: const LoginScreen(),
+    );
+  }
+}
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -17,7 +34,61 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final Map<String, String> _registeredUsers = {};
+  final Map<String, String> registeredUsers = {};
+
+  void _showMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        content: Row(
+          children: [
+            const Icon(Icons.info_outline, color: Colors.black),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'OK',
+              style: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _login() {
+    String phone = _phoneController.text.trim();
+    String password = _passwordController.text.trim();
+
+    if (phone.isEmpty || password.isEmpty) {
+      _showMessage("Please fill all fields!");
+      return;
+    }
+
+    if (registeredUsers.containsKey(phone) && registeredUsers[phone] == password) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    } else {
+      _showMessage("Invalid phone number or password!");
+    }
+  }
 
   @override
   void dispose() {
@@ -26,84 +97,9 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _showErrorMessage(String message) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        content: Text(
-          message,
-          style: GoogleFonts.poppins(fontSize: 14),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK', style: GoogleFonts.poppins()),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 🔹 Normal phone/password login
-  void _login() {
-    String phone = _phoneController.text.trim();
-    String password = _passwordController.text.trim();
-
-    if (phone.isEmpty || password.isEmpty) {
-      _showErrorMessage("Please fill all fields!");
-      return;
-    }
-
-    if (!_registeredUsers.containsKey(phone)) {
-      _showErrorMessage("User not registered! Please signup first.");
-      return;
-    }
-
-    if (_registeredUsers[phone] != password) {
-      _showErrorMessage("Incorrect password!");
-      return;
-    }
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-    );
-  }
-
-  // 🔹 Google Sign-In
-  Future<void> _loginWithGoogle() async {
-  try {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-    if (googleUser == null) return; // user cancelled
-
-    // ✅ yahan googleAuth define karo
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-
-    UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-
-    if (userCredential.user != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
-    }
-  } catch (e) {
-    _showErrorMessage("Google Sign-In failed!\n$e");
-  }
-}
-
   @override
   Widget build(BuildContext context) {
-    OutlineInputBorder border = OutlineInputBorder(
+    OutlineInputBorder roundedBorder = OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
       borderSide: BorderSide.none,
     );
@@ -111,92 +107,116 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Welcome to Blood Care!',
-                  style: GoogleFonts.poppins(
-                      fontSize: 28, fontWeight: FontWeight.w600)),
               const SizedBox(height: 16),
-              Text('Enter your phone number and password to login',
-                  style: GoogleFonts.poppins(
-                      fontSize: 14, color: Colors.grey[600])),
+              GestureDetector(
+                onTap: () {},
+                child: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
+              ),
               const SizedBox(height: 40),
+              Text(
+                'Welcome to Blood Care!',
+                style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.w600, color: Colors.black),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Enter your phone number and password to login',
+                style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.grey),
+              ),
+              const SizedBox(height: 40),
+              Text('Phone Number', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
               TextField(
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
-                  hintText: 'Phone Number',
+                  hintText: 'Mobile Number',
+                  hintStyle: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
-                  border: border,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  border: roundedBorder,
+                  enabledBorder: roundedBorder,
+                  focusedBorder: roundedBorder,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
+              Text('Password', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
               TextField(
                 controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   hintText: 'Password',
+                  hintStyle: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
-                  border: border,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  border: roundedBorder,
+                  enabledBorder: roundedBorder,
+                  focusedBorder: roundedBorder,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerRight,
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Text(
+                    'Forgot Password?',
+                    style: GoogleFonts.poppins(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
                   onPressed: _login,
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF5252),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12))),
-                  child: const Text("Login"),
+                    backgroundColor: const Color(0xFFFF5252),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
+                  ),
+                  child: Text('Login', style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white)),
                 ),
               ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: OutlinedButton.icon(
-                  onPressed: _loginWithGoogle,
-                  icon: Image.asset(
-                    'assets/google.png',
-                    height: 22,
-                  ),
-                  label: const Text(
-                    "Continue with Google",
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Don't have an account? "),
-                  TextButton(
-                      onPressed: () async {
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => SignupScreen(
-                                  registeredUsers: _registeredUsers)),
-                        );
-                        if (result != null && result is Map<String, String>) {
-                          _registeredUsers.addAll(result);
-                          _showErrorMessage("Signup successful! Please login.");
-                        }
-                      },
-                      child: const Text("Signup")),
+                  Text("Don't have an account? ", style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey)),
+                  GestureDetector(
+                    onTap: () async {
+                      // ✅ Navigate to SignupScreen and check return
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SignupScreen(registeredUsers: registeredUsers),
+                        ),
+                      );
+
+                      // Only show message if signup returned a value
+                      if (result != null && result is Map<String, String>) {
+                        final phone = result.keys.first;
+                        final password = result[phone];
+                        setState(() {
+                          _phoneController.text = phone;
+                          _passwordController.text = password!;
+                        });
+                        _showMessage("Signup successful! Please login.");
+                      }
+                    },
+                    child: Text(
+                      'Signup',
+                      style: GoogleFonts.poppins(fontSize: 14, color: const Color(0xFFFF5252), fontWeight: FontWeight.w600),
+                    ),
+                  ),
                 ],
               ),
             ],
