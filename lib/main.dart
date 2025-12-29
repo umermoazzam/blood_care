@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
-import 'screens/splash_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'screens/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const BloodCareApp());
 }
 
@@ -16,9 +21,9 @@ class BloodCareApp extends StatelessWidget {
       title: 'Blood Care',
       theme: ThemeData(
         primarySwatch: Colors.red,
-        fontFamily: 'Poppins',
+        fontFamily: 'Inter',
       ),
-      home: const SplashScreen(),
+      home: const LoginScreen(),
     );
   }
 }

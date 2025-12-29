@@ -1,201 +1,214 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'donor_list.dart';
 import 'login_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
+  Future<String> _getUserName() async {
+    // Reload currentUser to get updated displayName
+    await FirebaseAuth.instance.currentUser!.reload();
+    return FirebaseAuth.instance.currentUser?.displayName ?? "User";
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return FutureBuilder<String>(
+      future: _getUserName(),
+      builder: (context, snapshot) {
+        String userName = snapshot.data ?? "User";
+
+        return Scaffold(
+          backgroundColor: Colors.grey[50],
+          body: SafeArea(
+            child: Column(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            CircleAvatar(
-                              radius: 20,
-                              backgroundColor: Colors.white,
-                              child: Icon(Icons.person,
-                                  color: Color(0xFFEF4444), size: 20),
-                            ),
-                            SizedBox(width: 12),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            Row(
                               children: [
-                                Text(
-                                  "Welcome back",
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      color: Colors.white.withOpacity(0.9)),
+                                CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: Colors.white,
+                                  child: Icon(Icons.person,
+                                      color: Color(0xFFEF4444), size: 20),
                                 ),
-                                Text(
-                                  "Umer",
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white),
+                                SizedBox(width: 12),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Welcome back",
+                                      style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          color: Colors.white.withOpacity(0.9)),
+                                    ),
+                                    Text(
+                                      userName,
+                                      style: GoogleFonts.poppins(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white),
+                                    ),
+                                  ],
                                 ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                _circleBtn(Icons.notifications_outlined, context),
+                                SizedBox(width: 8),
+                                _circleBtn(Icons.logout, context),
                               ],
                             ),
                           ],
                         ),
+                        SizedBox(height: 32),
+                        Text(
+                          "Save a Life Today",
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          "Every donation counts. Be someone's hero.",
+                          style: GoogleFonts.poppins(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 13,
+                          ),
+                        ),
+                        SizedBox(height: 28),
+                      ],
+                    ),
+                  ),
+                ),
+                Transform.translate(
+                  offset: Offset(0, -40),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            print("Emergency tapped");
+                          },
+                          child: _emergencyCard(),
+                        ),
+                        SizedBox(height: 16),
                         Row(
                           children: [
-                            _circleBtn(Icons.notifications_outlined, context),
-                            SizedBox(width: 8),
-                            _circleBtn(Icons.logout, context),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const DonorListPage(),
+                                    ),
+                                  );
+                                },
+                                child: _actionCard(
+                                    Icons.search, "Find Donor", "Search nearby"),
+                              ),
+                            ),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  print("Be a Donor tapped");
+                                },
+                                child: _actionCard(Icons.favorite_border,
+                                    "Be a Donor", "Register now"),
+                              ),
+                            ),
                           ],
                         ),
                       ],
                     ),
-                    SizedBox(height: 32),
-                    Text(
-                      "Save a Life Today",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      "Every donation counts. Be someone's hero.",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 13,
-                      ),
-                    ),
-                    SizedBox(height: 28),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            Transform.translate(
-              offset: Offset(0, -40),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        print("Emergency tapped");
-                      },
-                      child: _emergencyCard(),
-                    ),
-                    SizedBox(height: 16),
-                    Row(
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              // ✅ Correct navigation to DonorListPage
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const DonorListPage(),
-                                ),
-                              );
-                            },
-                            child: _actionCard(
-                                Icons.search, "Find Donor", "Search nearby"),
+                        Text(
+                          'RECENT ACTIVITY',
+                          style: GoogleFonts.poppins(
+                            color: Colors.grey[600],
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1,
                           ),
                         ),
-                        SizedBox(width: 16),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              print("Be a Donor tapped");
-                            },
-                            child: _actionCard(Icons.favorite_border,
-                                "Be a Donor", "Register now"),
-                          ),
+                        SizedBox(height: 12),
+                        _recentItem(
+                          icon: Icons.favorite,
+                          iconColor: Color(0xFF16A34A),
+                          bgColor: Color(0xFFDCFCE7),
+                          title: 'Successful Donation',
+                          time: '2 days ago',
+                          badge: '+1',
                         ),
+                        SizedBox(height: 14),
+                        _recentItem(
+                          icon: Icons.person,
+                          iconColor: Color(0xFF2563EB),
+                          bgColor: Color(0xFFDBEAFE),
+                          title: 'Profile Updated',
+                          time: '1 week ago',
+                        ),
+                        SizedBox(height: 80),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'RECENT ACTIVITY',
-                      style: GoogleFonts.poppins(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    SizedBox(height: 12),
-                    _recentItem(
-                      icon: Icons.favorite,
-                      iconColor: Color(0xFF16A34A),
-                      bgColor: Color(0xFFDCFCE7),
-                      title: 'Successful Donation',
-                      time: '2 days ago',
-                      badge: '+1',
-                    ),
-                    SizedBox(height: 14),
-                    _recentItem(
-                      icon: Icons.person,
-                      iconColor: Color(0xFF2563EB),
-                      bgColor: Color(0xFFDBEAFE),
-                      title: 'Profile Updated',
-                      time: '1 week ago',
-                    ),
-                    SizedBox(height: 80),
-                  ],
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border(top: BorderSide(color: Colors.grey[200]!)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      GestureDetector(
+                          onTap: () => print("Home tapped"),
+                          child: _navItem(Icons.home, "Home", true)),
+                      GestureDetector(
+                          onTap: () => print("Donors tapped"),
+                          child: _navItem(Icons.favorite_border, "Donors", false)),
+                      GestureDetector(
+                          onTap: () => print("Profile tapped"),
+                          child: _navItem(Icons.person_outline, "Profile", false)),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border(top: BorderSide(color: Colors.grey[200]!)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  GestureDetector(
-                      onTap: () => print("Home tapped"),
-                      child: _navItem(Icons.home, "Home", true)),
-                  GestureDetector(
-                      onTap: () => print("Donors tapped"),
-                      child: _navItem(Icons.favorite_border, "Donors", false)),
-                  GestureDetector(
-                      onTap: () => print("Profile tapped"),
-                      child: _navItem(Icons.person_outline, "Profile", false)),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

@@ -3,27 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'signup_screen.dart';
 import 'home_screen.dart';
 import 'forgot_password_screen.dart';
-
-void main() {
-  runApp(const BloodCareApp());
-}
-
-class BloodCareApp extends StatelessWidget {
-  const BloodCareApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Blood Care',
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-        fontFamily: 'Inter',
-      ),
-      home: const LoginScreen(),
-    );
-  }
-}
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -35,8 +15,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final Map<String, String> registeredUsers = {};
-
+  bool _isLoading = false;
   bool _isHoveringForgot = false;
 
   void _showMessage(String message) {
@@ -75,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _login() {
+  void _login() async {
     String phone = _phoneController.text.trim();
     String password = _passwordController.text.trim();
 
@@ -84,14 +63,23 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    if (registeredUsers.containsKey(phone) &&
-        registeredUsers[phone] == password) {
+    setState(() => _isLoading = true);
+
+    try {
+      String email = "$phone@bloodcare.com"; // Dummy email
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
-    } else {
-      _showMessage("Invalid phone number or password!");
+    } on FirebaseAuthException catch (e) {
+      _showMessage("Login failed: ${e.message}");
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
@@ -140,8 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 40),
               Text('Phone Number',
-                  style:
-                      GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+                  style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               TextField(
                 controller: _phoneController,
@@ -161,8 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 24),
               Text('Password',
-                  style:
-                      GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+                  style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               TextField(
                 controller: _passwordController,
@@ -214,18 +200,25 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: _login,
+                  onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF5252),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                     elevation: 0,
                   ),
-                  child: Text('Login',
-                      style: GoogleFonts.poppins(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white)),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 2),
+                        )
+                      : Text('Login',
+                          style: GoogleFonts.poppins(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white)),
                 ),
               ),
               const SizedBox(height: 24),
@@ -240,17 +233,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              SignupScreen(registeredUsers: registeredUsers),
+                              SignupScreen(),
                         ),
                       );
 
-                      if (result != null && result is Map<String, String>) {
-                        final phone = result.keys.first;
-                        final password = result[phone];
-                        setState(() {
-                          _phoneController.text = phone;
-                          _passwordController.text = password!;
-                        });
+                      if (result != null && result is bool && result) {
                         _showMessage("Signup successful! Please login.");
                       }
                     },

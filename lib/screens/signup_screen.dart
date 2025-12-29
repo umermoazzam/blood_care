@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignupScreen extends StatefulWidget {
-  final Map<String, String>? registeredUsers;
-
-  const SignupScreen({Key? key, this.registeredUsers}) : super(key: key);
+  const SignupScreen({Key? key}) : super(key: key);
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -14,6 +13,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   void _showErrorMessage(String message) {
     showDialog(
@@ -53,7 +53,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  void _signup() {
+  void _signup() async {
     String name = _nameController.text.trim();
     String phone = _mobileController.text.trim();
     String password = _passwordController.text.trim();
@@ -63,13 +63,25 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
 
-    if (widget.registeredUsers!.containsKey(phone)) {
-      _showErrorMessage("User already exists! Try login.");
-      return;
-    }
+    setState(() => _isLoading = true);
 
-    widget.registeredUsers![phone] = password;
-    Navigator.pop(context, {phone: password});
+    try {
+      String email = "$phone@bloodcare.com"; // Dummy email
+      UserCredential userCred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // ✅ Update displayName
+      await userCred.user!.updateDisplayName(name);
+      await userCred.user!.reload(); // ✅ ensure currentUser updated
+
+      Navigator.pop(context, true);
+    } on FirebaseAuthException catch (e) {
+      _showErrorMessage("Signup failed: ${e.message}");
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -174,42 +186,20 @@ class _SignupScreenState extends State<SignupScreen> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: _signup,
+                    onPressed: _isLoading ? null : _signup,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF5252),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       elevation: 0,
                     ),
-                    child: Text(
-                      'Sign Up',
-                      style: GoogleFonts.poppins(fontSize: 19, fontWeight: FontWeight.w600, color: Colors.white),
-                    ),
+                    child: _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text(
+                            'Sign Up',
+                            style: GoogleFonts.poppins(fontSize: 19, fontWeight: FontWeight.w600, color: Colors.white),
+                          ),
                   ),
                 ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Already have an account? ",
-                      style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        'Login',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: const Color(0xFFFF5252),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
               ],
             ),
           ),
