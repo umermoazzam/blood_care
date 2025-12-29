@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'screens/login_screen.dart';
+import 'screens/splash_screen.dart';  // Keep this
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +23,7 @@ class BloodCareApp extends StatelessWidget {
         primarySwatch: Colors.red,
         fontFamily: 'Inter',
       ),
-      home: const LoginScreen(),
+      home: const SplashScreen(),
     );
   }
 }
