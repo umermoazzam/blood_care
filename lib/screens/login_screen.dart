@@ -1,7 +1,9 @@
+// login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'signup_screen.dart';
 import 'home_screen.dart';
+import 'forgot_password_screen.dart'; // ✅ Forgot Password import
 
 void main() {
   runApp(const BloodCareApp());
@@ -36,6 +38,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final Map<String, String> registeredUsers = {};
 
+  bool _isHoveringForgot = false; // ✅ hover state for Forgot Password
+
   void _showMessage(String message) {
     showDialog(
       context: context,
@@ -63,7 +67,8 @@ class _LoginScreenState extends State<LoginScreen> {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'OK',
-              style: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600),
+              style: GoogleFonts.poppins(
+                  color: Colors.black, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -80,7 +85,8 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    if (registeredUsers.containsKey(phone) && registeredUsers[phone] == password) {
+    if (registeredUsers.containsKey(phone) &&
+        registeredUsers[phone] == password) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -120,58 +126,93 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 40),
               Text(
                 'Welcome to Blood Care!',
-                style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.w600, color: Colors.black),
+                style: GoogleFonts.poppins(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black),
               ),
               const SizedBox(height: 8),
               Text(
                 'Enter your phone number and password to login',
-                style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.grey),
+                style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey),
               ),
               const SizedBox(height: 40),
-              Text('Phone Number', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+              Text('Phone Number',
+                  style:
+                      GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               TextField(
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
                   hintText: 'Mobile Number',
-                  hintStyle: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
+                  hintStyle:
+                      GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   border: roundedBorder,
                   enabledBorder: roundedBorder,
                   focusedBorder: roundedBorder,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
               ),
               const SizedBox(height: 24),
-              Text('Password', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+              Text('Password',
+                  style:
+                      GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               TextField(
                 controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   hintText: 'Password',
-                  hintStyle: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
+                  hintStyle:
+                      GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   border: roundedBorder,
                   enabledBorder: roundedBorder,
                   focusedBorder: roundedBorder,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
               ),
               const SizedBox(height: 16),
+
+              // ✅ Forgot Password with hover effect (color change only, no underline)
               Align(
                 alignment: Alignment.centerRight,
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Text(
-                    'Forgot Password?',
-                    style: GoogleFonts.poppins(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w500),
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  onEnter: (_) => setState(() => _isHoveringForgot = true),
+                  onExit: (_) => setState(() => _isHoveringForgot = false),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ForgotPasswordScreen()),
+                      );
+                    },
+                    child: Text(
+                      'Forgot Password?',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: _isHoveringForgot
+                            ? const Color(0xFFFF5252)
+                            : Colors.black,
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.none, // ❌ removed underline
+                      ),
+                    ),
                   ),
                 ),
               ),
+
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
@@ -180,28 +221,33 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF5252),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     elevation: 0,
                   ),
-                  child: Text('Login', style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white)),
+                  child: Text('Login',
+                      style: GoogleFonts.poppins(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white)),
                 ),
               ),
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Don't have an account? ", style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey)),
+                  Text("Don't have an account? ",
+                      style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey)),
                   GestureDetector(
                     onTap: () async {
-                      // ✅ Navigate to SignupScreen and check return
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SignupScreen(registeredUsers: registeredUsers),
+                          builder: (context) =>
+                              SignupScreen(registeredUsers: registeredUsers),
                         ),
                       );
 
-                      // Only show message if signup returned a value
                       if (result != null && result is Map<String, String>) {
                         final phone = result.keys.first;
                         final password = result[phone];
@@ -214,7 +260,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: Text(
                       'Signup',
-                      style: GoogleFonts.poppins(fontSize: 14, color: const Color(0xFFFF5252), fontWeight: FontWeight.w600),
+                      style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: const Color(0xFFFF5252),
+                          fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
