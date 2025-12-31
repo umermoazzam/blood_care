@@ -1,3 +1,4 @@
+// signup_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -228,7 +229,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                 const SizedBox(height: 24),
 
-                // 🔽 ADDED: Login link (ONLY NEW PART)
+                // 🔽 Login link with press effect
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -239,7 +240,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         color: Colors.grey,
                       ),
                     ),
-                    GestureDetector(
+                    InkWell(
+                      borderRadius: BorderRadius.circular(6),
                       onTap: () {
                         Navigator.pushReplacement(
                           context,
@@ -247,12 +249,16 @@ class _SignupScreenState extends State<SignupScreen> {
                               builder: (context) => const LoginScreen()),
                         );
                       },
-                      child: Text(
-                        'Login',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: const Color(0xFFFF5252),
-                          fontWeight: FontWeight.w600,
+                      child: Padding(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        child: Text(
+                          'Login',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: const Color(0xFFFF5252),
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),

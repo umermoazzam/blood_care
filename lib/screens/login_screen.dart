@@ -1,3 +1,4 @@
+// login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'signup_screen.dart';
@@ -71,6 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
         password: password,
       );
 
+      if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -78,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } on FirebaseAuthException catch (e) {
       _showMessage("Login failed: ${e.message}");
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -99,158 +101,184 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              GestureDetector(
-                onTap: () {},
-                child: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
-              ),
-              const SizedBox(height: 40),
-              Text(
-                'Welcome to Blood Care!',
-                style: GoogleFonts.poppins(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+                // Back Button (Jaise Signup mein hai)
+                InkWell(
+                  onTap: () => Navigator.maybePop(context),
+                  child: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
+                ),
+                
+                // Content start height (Symmetry with Signup Screen)
+                const SizedBox(height: 70), 
+                
+                Text(
+                  'Welcome to Blood Care!',
+                  style: GoogleFonts.poppins(
                     fontSize: 28,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Enter your email and password to login',
-                style: GoogleFonts.poppins(
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Enter your email and password to login',
+                  style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    color: Colors.grey),
-              ),
-              const SizedBox(height: 40),
-              Text('Email',
-                  style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  hintText: 'Email Address',
-                  hintStyle:
-                      GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
-                  border: roundedBorder,
-                  enabledBorder: roundedBorder,
-                  focusedBorder: roundedBorder,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    color: Colors.grey,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              Text('Password',
-                  style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'Password',
-                  hintStyle:
-                      GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
-                  border: roundedBorder,
-                  enabledBorder: roundedBorder,
-                  focusedBorder: roundedBorder,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                const SizedBox(height: 40),
+
+                // Email Field
+                Text('Email',
+                    style: GoogleFonts.poppins(
+                        fontSize: 16, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    hintText: 'Email Address',
+                    hintStyle: GoogleFonts.poppins(
+                        color: Colors.grey[600], fontSize: 14),
+                    filled: true,
+                    fillColor: const Color(0xFFF5F5F5),
+                    border: roundedBorder,
+                    enabledBorder: roundedBorder,
+                    focusedBorder: roundedBorder,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerRight,
-                child: MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  onEnter: (_) => setState(() => _isHoveringForgot = true),
-                  onExit: (_) => setState(() => _isHoveringForgot = false),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ForgotPasswordScreen()),
-                      );
-                    },
-                    child: Text(
-                      'Forgot Password?',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: _isHoveringForgot
-                            ? const Color(0xFFFF5252)
-                            : Colors.black,
-                        fontWeight: FontWeight.w500,
-                        decoration: TextDecoration.none,
+                const SizedBox(height: 24),
+
+                // Password Field
+                Text('Password',
+                    style: GoogleFonts.poppins(
+                        fontSize: 16, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    hintStyle: GoogleFonts.poppins(
+                        color: Colors.grey[600], fontSize: 14),
+                    filled: true,
+                    fillColor: const Color(0xFFF5F5F5),
+                    border: roundedBorder,
+                    enabledBorder: roundedBorder,
+                    focusedBorder: roundedBorder,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Forgot Password
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    onEnter: (_) => setState(() => _isHoveringForgot = true),
+                    onExit: (_) => setState(() => _isHoveringForgot = false),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const ForgotPasswordScreen()),
+                        );
+                      },
+                      child: Text(
+                        'Forgot Password?',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: _isHoveringForgot
+                              ? const Color(0xFFFF5252)
+                              : Colors.black,
+                          fontWeight: FontWeight.w500,
+                          decoration: TextDecoration.none,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _login,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF5252),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    elevation: 0,
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2),
-                        )
-                      : Text('Login',
-                          style: GoogleFonts.poppins(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white)),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Don't have an account? ",
-                      style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey)),
-                  GestureDetector(
-                    onTap: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              SignupScreen(),
-                        ),
-                      );
+                const SizedBox(height: 32),
 
-                      if (result != null && result is bool && result) {
-                        _showMessage("Signup successful! Please login.");
-                      }
-                    },
-                    child: Text(
-                      'Signup',
-                      style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: const Color(0xFFFF5252),
-                          fontWeight: FontWeight.w600),
+                // Login Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _login,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF5252),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      elevation: 0,
                     ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2),
+                          )
+                        : Text('Login',
+                            style: GoogleFonts.poppins(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white)),
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 24),
+
+                // Signup Link with press effect
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Don't have an account? ",
+                        style: GoogleFonts.poppins(
+                            fontSize: 14, color: Colors.grey)),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(6),
+                      onTap: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SignupScreen(),
+                          ),
+                        );
+
+                        if (result != null && result is bool && result) {
+                          _showMessage("Signup successful! Please login.");
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        child: Text(
+                          'Signup',
+                          style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: const Color(0xFFFF5252),
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24), // Extra bottom padding
+              ],
+            ),
           ),
         ),
       ),
