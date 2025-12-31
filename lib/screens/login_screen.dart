@@ -13,7 +13,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _isHoveringForgot = false;
@@ -55,10 +55,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _login() async {
-    String phone = _phoneController.text.trim();
+    String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
-    if (phone.isEmpty || password.isEmpty) {
+    if (email.isEmpty || password.isEmpty) {
       _showMessage("Please fill all fields!");
       return;
     }
@@ -66,7 +66,6 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      String email = "$phone@bloodcare.com"; // Dummy email
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
@@ -85,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -120,21 +119,21 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Enter your phone number and password to login',
+                'Enter your email and password to login',
                 style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey),
               ),
               const SizedBox(height: 40),
-              Text('Phone Number',
+              Text('Email',
                   style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               TextField(
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  hintText: 'Mobile Number',
+                  hintText: 'Email Address',
                   hintStyle:
                       GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
                   filled: true,
@@ -198,13 +197,13 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
-                height: 56,
+                height: 48,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF5252),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(10)),
                     elevation: 0,
                   ),
                   child: _isLoading
@@ -217,7 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       : Text('Login',
                           style: GoogleFonts.poppins(
                               fontSize: 17,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w500,
                               color: Colors.white)),
                 ),
               ),

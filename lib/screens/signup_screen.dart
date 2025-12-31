@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -11,7 +12,7 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _mobileController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
@@ -55,10 +56,10 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _signup() async {
     String name = _nameController.text.trim();
-    String phone = _mobileController.text.trim();
+    String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
-    if (name.isEmpty || phone.isEmpty || password.isEmpty) {
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
       _showErrorMessage("Please fill all fields!");
       return;
     }
@@ -66,15 +67,14 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() => _isLoading = true);
 
     try {
-      String email = "$phone@bloodcare.com"; // Dummy email
-      UserCredential userCred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCred =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // ✅ Update displayName
       await userCred.user!.updateDisplayName(name);
-      await userCred.user!.reload(); // ✅ ensure currentUser updated
+      await userCred.user!.reload();
 
       Navigator.pop(context, true);
     } on FirebaseAuthException catch (e) {
@@ -87,7 +87,7 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _mobileController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -111,7 +111,8 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 16),
                 InkWell(
                   onTap: () => Navigator.pop(context),
-                  child: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
+                  child:
+                      const Icon(Icons.arrow_back, color: Colors.black, size: 24),
                 ),
                 const SizedBox(height: 70),
                 Text(
@@ -132,73 +133,130 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 const SizedBox(height: 40),
-                Text('Name', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+
+                // Name
+                Text('Name',
+                    style: GoogleFonts.poppins(
+                        fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _nameController,
                   decoration: InputDecoration(
                     hintText: 'Full Name',
-                    hintStyle: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
+                    hintStyle: GoogleFonts.poppins(
+                        color: Colors.grey[600], fontSize: 14),
                     filled: true,
                     fillColor: const Color(0xFFF5F5F5),
                     border: roundedBorder,
                     enabledBorder: roundedBorder,
                     focusedBorder: roundedBorder,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
                   ),
                 ),
                 const SizedBox(height: 24),
-                Text('Mobile Number', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+
+                // Email
+                Text('Email',
+                    style: GoogleFonts.poppins(
+                        fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 TextField(
-                  controller: _mobileController,
-                  keyboardType: TextInputType.phone,
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                    hintText: 'Phone Number',
-                    hintStyle: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
+                    hintText: 'Email Address',
+                    hintStyle: GoogleFonts.poppins(
+                        color: Colors.grey[600], fontSize: 14),
                     filled: true,
                     fillColor: const Color(0xFFF5F5F5),
                     border: roundedBorder,
                     enabledBorder: roundedBorder,
                     focusedBorder: roundedBorder,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
                   ),
                 ),
                 const SizedBox(height: 24),
-                Text('Password', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+
+                // Password
+                Text('Password',
+                    style: GoogleFonts.poppins(
+                        fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
                     hintText: 'Password',
-                    hintStyle: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
+                    hintStyle: GoogleFonts.poppins(
+                        color: Colors.grey[600], fontSize: 14),
                     filled: true,
                     fillColor: const Color(0xFFF5F5F5),
                     border: roundedBorder,
                     enabledBorder: roundedBorder,
                     focusedBorder: roundedBorder,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
                   ),
                 ),
                 const SizedBox(height: 32),
+
+                // Sign Up Button
                 SizedBox(
                   width: double.infinity,
-                  height: 56,
+                  height: 48,
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _signup,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF5252),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
                       elevation: 0,
                     ),
                     child: _isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
                         : Text(
                             'Sign Up',
-                            style: GoogleFonts.poppins(fontSize: 19, fontWeight: FontWeight.w600, color: Colors.white),
+                            style: GoogleFonts.poppins(
+                                fontSize: 19,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white),
                           ),
                   ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // 🔽 ADDED: Login link (ONLY NEW PART)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Already have an account? ",
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginScreen()),
+                        );
+                      },
+                      child: Text(
+                        'Login',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: const Color(0xFFFF5252),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
