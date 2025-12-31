@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'donor_list.dart';
 import 'login_screen.dart';
-import 'be_donor_screen.dart'; // Make sure to import BeDonorScreen
+import 'be_donor_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -21,6 +21,43 @@ class _HomeScreenState extends State<HomeScreen> {
     return FirebaseAuth.instance.currentUser?.displayName ?? "User";
   }
 
+  // 🔴 LOGOUT CONFIRMATION DIALOG FUNCTION
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text("", 
+            style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+          content: Text("Are you sure you want to logout?", 
+            style: GoogleFonts.poppins()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context), // Dialog band karein
+              child: Text("Cancel", 
+                style: GoogleFonts.poppins(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                if (!mounted) return;
+                // Login screen par le jayein aur stack clear karein
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
+              },
+              child: Text("Logout", 
+                style: GoogleFonts.poppins(color: const Color(0xFFEF4444), fontWeight: FontWeight.w500)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
@@ -28,14 +65,13 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, snapshot) {
         String userName = snapshot.data ?? "User";
 
-        // Determine which page to show
         Widget body;
         if (currentIndex == 0) {
           body = _homeContent(userName);
         } else if (currentIndex == 1) {
           body = const DonorListPage();
         } else {
-          body = Center(
+          body = const Center(
               child: Text("Profile Page",
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)));
         }
@@ -44,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: Colors.grey[50],
           body: body,
           bottomNavigationBar: Container(
-            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border(top: BorderSide(color: Colors.grey[200]!)),
@@ -71,16 +107,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --------------------------
-  // HOME CONTENT WIDGET
-  // --------------------------
   Widget _homeContent(String userName) {
     return SafeArea(
       child: Column(
         children: [
-          // Top Header
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -97,13 +129,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Row(
                         children: [
-                          CircleAvatar(
+                          const CircleAvatar(
                             radius: 20,
                             backgroundColor: Colors.white,
                             child: Icon(Icons.person,
                                 color: Color(0xFFEF4444), size: 20),
                           ),
-                          SizedBox(width: 12),
+                          const SizedBox(width: 12),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -123,29 +155,29 @@ class _HomeScreenState extends State<HomeScreen> {
                       Row(
                         children: [
                           _circleBtn(Icons.notifications_outlined),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           _circleBtn(Icons.logout),
                         ],
                       ),
                     ],
                   ),
-                  SizedBox(height: 32),
+                  const SizedBox(height: 32),
                   Text("Save a Life Today",
                       style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontSize: 28,
                           fontWeight: FontWeight.bold)),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text("Every donation counts. Be someone's hero.",
                       style: GoogleFonts.poppins(
                           color: Colors.white.withOpacity(0.9), fontSize: 13)),
-                  SizedBox(height: 28),
+                  const SizedBox(height: 28),
                 ],
               ),
             ),
           ),
           Transform.translate(
-            offset: Offset(0, -40),
+            offset: const Offset(0, -40),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
@@ -154,22 +186,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     onTap: () => print("Emergency tapped"),
                     child: _emergencyCard(),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
                         child: GestureDetector(
-                          onTap: () {
-                            setState(() => currentIndex = 1);
-                          },
+                          onTap: () => setState(() => currentIndex = 1),
                           child: _actionCard(
                               Icons.search, "Find Donor", "Search nearby"),
                         ),
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: GestureDetector(
-                          // ✅ Updated onTap to navigate to BeDonorScreen
                           onTap: () {
                             Navigator.push(
                               context,
@@ -189,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Expanded(
             child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -199,22 +228,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1)),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   _recentItem(
                       icon: Icons.favorite,
-                      iconColor: Color(0xFF16A34A),
-                      bgColor: Color(0xFFDCFCE7),
+                      iconColor: const Color(0xFF16A34A),
+                      bgColor: const Color(0xFFDCFCE7),
                       title: 'Successful Donation',
                       time: '2 days ago',
                       badge: '+1'),
-                  SizedBox(height: 14),
+                  const SizedBox(height: 14),
                   _recentItem(
                       icon: Icons.person,
-                      iconColor: Color(0xFF2563EB),
-                      bgColor: Color(0xFFDBEAFE),
+                      iconColor: const Color(0xFF2563EB),
+                      bgColor: const Color(0xFFDBEAFE),
                       title: 'Profile Updated',
                       time: '1 week ago'),
-                  SizedBox(height: 80),
+                  const SizedBox(height: 80),
                 ],
               ),
             ),
@@ -231,7 +260,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: () {
         if (icon == Icons.logout) {
-          FirebaseAuth.instance.signOut();
+          _showLogoutDialog(context); // Logout Dialog trigger karein
         } else {
           print("Icon tapped: $icon");
         }
@@ -250,12 +279,12 @@ class _HomeScreenState extends State<HomeScreen> {
       borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             colors: [Color(0xFFF97316), Color(0xFFEF4444)],
           ),
           borderRadius: BorderRadius.circular(16),
         ),
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -268,9 +297,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(Icons.error_outline, color: Colors.white, size: 28),
+                  child: const Icon(Icons.error_outline, color: Colors.white, size: 28),
                 ),
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -279,7 +308,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Colors.white)),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text("Need blood urgently?",
                         style: GoogleFonts.poppins(
                             fontSize: 13, color: Colors.white.withOpacity(0.9))),
@@ -287,7 +316,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            Icon(Icons.chevron_right, color: Colors.white),
+            const Icon(Icons.chevron_right, color: Colors.white),
           ],
         ),
       ),
@@ -299,7 +328,7 @@ class _HomeScreenState extends State<HomeScreen> {
       elevation: 3,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -308,18 +337,18 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             Container(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Color(0xFFFEE2E2),
+                color: const Color(0xFFFEE2E2),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: Color(0xFFEF4444), size: 22),
+              child: Icon(icon, color: const Color(0xFFEF4444), size: 22),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(title,
                 style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600, fontSize: 15)),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(subtitle,
                 style: GoogleFonts.poppins(
                     fontSize: 11, color: Colors.grey[500])),
@@ -338,7 +367,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String? badge,
   }) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.grey[50],
         borderRadius: BorderRadius.circular(12),
@@ -354,14 +383,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 backgroundColor: bgColor,
                 child: Icon(icon, color: iconColor, size: 18),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title,
                       style: GoogleFonts.poppins(
                           fontWeight: FontWeight.w500, fontSize: 13)),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(time,
                       style: GoogleFonts.poppins(
                           fontSize: 11, color: Colors.grey[500])),
@@ -371,7 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           if (badge != null)
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
                 color: bgColor,
                 borderRadius: BorderRadius.circular(12),
@@ -394,20 +423,20 @@ class _HomeScreenState extends State<HomeScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: active ? Color(0xFFFEE2E2) : Colors.grey[100],
+            color: active ? const Color(0xFFFEE2E2) : Colors.grey[100],
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon,
-              size: 20, color: active ? Color(0xFFEF4444) : Colors.grey[400]),
+              size: 20, color: active ? const Color(0xFFEF4444) : Colors.grey[400]),
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         Text(label,
             style: GoogleFonts.poppins(
               fontSize: 11,
               fontWeight: FontWeight.w500,
-              color: active ? Color(0xFFEF4444) : Colors.grey[400],
+              color: active ? const Color(0xFFEF4444) : Colors.grey[400],
             )),
       ],
     );
