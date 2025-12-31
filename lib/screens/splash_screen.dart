@@ -90,7 +90,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   style: GoogleFonts.poppins(
                     fontSize: 17,
                     fontWeight: FontWeight.w400,
-                    color: const Color(0xFF757575),
+                    color: Colors.grey[400],
                   ),
                 ),
                 800,

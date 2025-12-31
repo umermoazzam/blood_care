@@ -18,7 +18,7 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  
+
   String? _selectedBloodGroup;
   bool _isLoading = false;
   bool _isRegistered = false;
@@ -172,14 +172,17 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Red Header Section
+            // Red Header Section - UPDATED GRADIENT
             Container(
               width: double.infinity,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [Color(0xFFFF5252), Color(0xFFEF4444)],
+                  begin: Alignment.topLeft,    // diagonal
+                  end: Alignment.bottomRight,  // diagonal
+                  colors: [
+                    Color(0xFFEF4444),        // start color
+                    Color(0xFFDC2626),        // end color
+                  ],
                 ),
               ),
               padding: const EdgeInsets.all(24.0),
@@ -565,7 +568,7 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
     return Column(
       children: [
         const SizedBox(height: 60),
-        
+
         // Success Icon
         Container(
           width: 100,
