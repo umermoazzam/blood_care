@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // 🔹 Added for Firestore
 import 'login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -68,18 +69,31 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() => _isLoading = true);
 
     try {
+      // 1️⃣ Create user in Firebase Auth
       UserCredential userCred =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
+      // 2️⃣ Update display name in Auth (optional)
       await userCred.user!.updateDisplayName(name);
       await userCred.user!.reload();
 
+      // 3️⃣ 🔹 Save user data to Firestore
+      String uid = userCred.user!.uid;
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'name': name,
+        'email': email,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      // Navigate back or to Home Screen
       Navigator.pop(context, true);
     } on FirebaseAuthException catch (e) {
       _showErrorMessage("Signup failed: ${e.message}");
+    } catch (e) {
+      _showErrorMessage("Something went wrong. Please try again.");
     } finally {
       setState(() => _isLoading = false);
     }
