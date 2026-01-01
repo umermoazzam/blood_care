@@ -1,3 +1,4 @@
+// login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'signup_screen.dart';
@@ -15,8 +16,12 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
   bool _isLoading = false;
   bool _isHoveringForgot = false;
+
+  // ✅ NEW: password visibility control
+  bool _obscurePassword = true;
 
   void _showMessage(String message) {
     showDialog(
@@ -46,7 +51,9 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Text(
               'OK',
               style: GoogleFonts.poppins(
-                  color: Colors.black, fontWeight: FontWeight.w600),
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -111,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onTap: () => Navigator.maybePop(context),
                   child: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
                 ),
-                const SizedBox(height: 70), 
+                const SizedBox(height: 70),
                 Text(
                   'Welcome to Blood Care!',
                   style: GoogleFonts.poppins(
@@ -130,6 +137,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 40),
+
+                /// Email
                 Text('Email',
                     style: GoogleFonts.poppins(
                         fontSize: 16, fontWeight: FontWeight.w600)),
@@ -150,14 +159,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         horizontal: 16, vertical: 16),
                   ),
                 ),
+
                 const SizedBox(height: 24),
+
+                /// Password
                 Text('Password',
                     style: GoogleFonts.poppins(
                         fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _passwordController,
-                  obscureText: true,
+                  obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     hintText: 'Password',
                     hintStyle: GoogleFonts.poppins(
@@ -169,8 +181,24 @@ class _LoginScreenState extends State<LoginScreen> {
                     focusedBorder: roundedBorder,
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 16),
+
+                    // ✅ Eye icon added
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey[700],
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
                   ),
                 ),
+
                 const SizedBox(height: 16),
                 Align(
                   alignment: Alignment.centerRight,
@@ -183,8 +211,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  const ForgotPasswordScreen()),
+                            builder: (context) =>
+                                const ForgotPasswordScreen(),
+                          ),
                         );
                       },
                       child: Text(
@@ -195,12 +224,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               ? const Color(0xFFFF5252)
                               : Colors.black,
                           fontWeight: FontWeight.w500,
-                          decoration: TextDecoration.none,
                         ),
                       ),
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 32),
                 SizedBox(
                   width: double.infinity,
@@ -227,6 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.white)),
                   ),
                 ),
+
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -235,7 +265,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: GoogleFonts.poppins(
                             fontSize: 14, color: Colors.grey)),
                     InkWell(
-                      borderRadius: BorderRadius.circular(6),
                       onTap: () async {
                         final result = await Navigator.push(
                           context,
@@ -249,7 +278,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
                       },
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 2),
                         child: Text(
                           'Signup',
                           style: GoogleFonts.poppins(
