@@ -1,8 +1,8 @@
 // be_donor_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Uncommented
+import 'package:cloud_firestore/cloud_firestore.dart'; // Uncommented
 
 class BeDonorScreen extends StatefulWidget {
   const BeDonorScreen({Key? key}) : super(key: key);
@@ -122,16 +122,15 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Firebase Implementation - Uncomment when using Firebase
-      /*
+      // Real Firebase Implementation
       final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        _showMessage("Please login first", isError: true);
-        setState(() => _isLoading = false);
-        return;
-      }
+      
+      // Agar user login nahi hai, tab bhi hum data store kar sakte hain 
+      // ya phir auto-generated ID use kar sakte hain agar aap registration compulsory nahi rakhna chahte.
+      // Yahan hum user UID use kar rahe hain (best practice)
+      String userId = user?.uid ?? FirebaseFirestore.instance.collection('donors').doc().id;
 
-      await FirebaseFirestore.instance.collection('donors').doc(user.uid).set({
+      await FirebaseFirestore.instance.collection('donors').doc(userId).set({
         'name': _nameController.text.trim(),
         'phone': _phoneController.text.trim(),
         'email': _emailController.text.trim(),
@@ -143,10 +142,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
         'registeredAt': FieldValue.serverTimestamp(),
         'lastDonation': null,
       });
-      */
-
-      // Demo Implementation - Remove when using Firebase
-      await Future.delayed(const Duration(seconds: 2));
 
       setState(() {
         _isLoading = false;
@@ -156,7 +151,7 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
       _showMessage("Registration successful! You are now a blood donor.");
     } catch (e) {
       setState(() => _isLoading = false);
-      _showMessage("Registration failed. Please try again.", isError: true);
+      _showMessage("Registration failed: ${e.toString()}", isError: true);
     }
   }
 
@@ -172,16 +167,15 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Red Header Section - UPDATED GRADIENT
             Container(
               width: double.infinity,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment.topLeft,    // diagonal
-                  end: Alignment.bottomRight,  // diagonal
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFFEF4444),        // start color
-                    Color(0xFFDC2626),        // end color
+                    Color(0xFFEF4444),
+                    Color(0xFFDC2626),
                   ],
                 ),
               ),
@@ -189,7 +183,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Back Button
                   InkWell(
                     onTap: () => Navigator.pop(context),
                     borderRadius: BorderRadius.circular(8),
@@ -207,8 +200,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Title
                   Text(
                     'Become a Donor',
                     style: GoogleFonts.poppins(
@@ -218,8 +209,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-
-                  // Subtitle
                   Text(
                     'Register as a blood donor and save lives. Fill in your details below.',
                     style: GoogleFonts.poppins(
@@ -232,8 +221,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                 ],
               ),
             ),
-
-            // Scrollable Form Content
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
@@ -242,7 +229,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Name Field
                             Text(
                               'Full Name',
                               style: GoogleFonts.poppins(
@@ -274,8 +260,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               ),
                             ),
                             const SizedBox(height: 20),
-
-                            // Phone Field
                             Text(
                               'Phone Number',
                               style: GoogleFonts.poppins(
@@ -307,8 +291,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               ),
                             ),
                             const SizedBox(height: 20),
-
-                            // Email Field
                             Text(
                               'Email Address',
                               style: GoogleFonts.poppins(
@@ -340,8 +322,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               ),
                             ),
                             const SizedBox(height: 20),
-
-                            // Blood Group Selection
                             Text(
                               'Blood Group',
                               style: GoogleFonts.poppins(
@@ -388,8 +368,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               ),
                             ),
                             const SizedBox(height: 20),
-
-                            // Age Field
                             Text(
                               'Age',
                               style: GoogleFonts.poppins(
@@ -421,8 +399,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               ),
                             ),
                             const SizedBox(height: 20),
-
-                            // City Field
                             Text(
                               'City',
                               style: GoogleFonts.poppins(
@@ -454,8 +430,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               ),
                             ),
                             const SizedBox(height: 20),
-
-                            // Address Field
                             Text(
                               'Address',
                               style: GoogleFonts.poppins(
@@ -488,8 +462,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               ),
                             ),
                             const SizedBox(height: 32),
-
-                            // Register Button
                             SizedBox(
                               width: double.infinity,
                               height: 56,
@@ -522,8 +494,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               ),
                             ),
                             const SizedBox(height: 24),
-
-                            // Info Card
                             Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
@@ -568,8 +538,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
     return Column(
       children: [
         const SizedBox(height: 60),
-
-        // Success Icon
         Container(
           width: 100,
           height: 100,
@@ -584,8 +552,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
           ),
         ),
         const SizedBox(height: 32),
-
-        // Success Title
         Text(
           'Registration Successful!',
           textAlign: TextAlign.center,
@@ -596,8 +562,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
           ),
         ),
         const SizedBox(height: 16),
-
-        // Success Message
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
@@ -611,8 +575,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
           ),
         ),
         const SizedBox(height: 32),
-
-        // Donor Info Card
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 24),
           padding: const EdgeInsets.all(20),
@@ -671,8 +633,6 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
           ),
         ),
         const SizedBox(height: 40),
-
-        // Back Button
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: SizedBox(
