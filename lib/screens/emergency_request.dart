@@ -1,365 +1,639 @@
-// emergency_request_page.dart
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EmergencyRequestPage extends StatefulWidget {
   const EmergencyRequestPage({Key? key}) : super(key: key);
 
   @override
-  _EmergencyRequestPageState createState() => _EmergencyRequestPageState();
+  State<EmergencyRequestPage> createState() => _EmergencyRequestPageState();
 }
 
 class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
-  final _formKey = GlobalKey<FormState>();
-  String patientName = '';
-  String bloodGroup = '';
-  String contactNumber = '';
-  String location = '';
-  String message = '';
-  bool submitted = false;
+  final TextEditingController _patientNameController = TextEditingController();
+  final TextEditingController _hospitalController = TextEditingController();
+  final TextEditingController _contactController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
 
-  final List<String> bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+  String selectedBloodType = "";
+  String selectedUrgency = "High";
+  bool isLoading = false;
 
-  void handleSubmit() {
-    if (_formKey.currentState!.validate() && bloodGroup.isNotEmpty) {
+  final List<String> bloodTypes = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
+  final List<String> urgencyLevels = ["High", "Medium", "Critical"];
+
+  @override
+  void dispose() {
+    _patientNameController.dispose();
+    _hospitalController.dispose();
+    _contactController.dispose();
+    _messageController.dispose();
+    _locationController.dispose();
+    super.dispose();
+  }
+
+  void _showMessage(String message, {bool isError = false}) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        content: Row(
+          children: [
+            Icon(
+              isError ? Icons.error_outline : Icons.check_circle_outline,
+              color: isError ? Colors.red : Colors.green,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'OK',
+              style: GoogleFonts.poppins(
+                color: const Color(0xFFFF5252),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _submitRequest() async {
+    // Validation
+    if (selectedBloodType.isEmpty) {
+      _showMessage("Please select a blood type!", isError: true);
+      return;
+    }
+
+    if (_patientNameController.text.trim().isEmpty) {
+      _showMessage("Please enter patient name!", isError: true);
+      return;
+    }
+
+    if (_hospitalController.text.trim().isEmpty) {
+      _showMessage("Please enter hospital name!", isError: true);
+      return;
+    }
+
+    if (_contactController.text.trim().isEmpty) {
+      _showMessage("Please enter contact number!", isError: true);
+      return;
+    }
+
+    if (_contactController.text.trim().length < 11) {
+      _showMessage("Please enter a valid contact number!", isError: true);
+      return;
+    }
+
+    if (_locationController.text.trim().isEmpty) {
+      _showMessage("Please enter location!", isError: true);
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      // Save to Firestore
+      await FirebaseFirestore.instance.collection('emergency_requests').add({
+        'patientName': _patientNameController.text.trim(),
+        'bloodType': selectedBloodType,
+        'hospital': _hospitalController.text.trim(),
+        'contact': _contactController.text.trim(),
+        'location': _locationController.text.trim(),
+        'urgency': selectedUrgency,
+        'message': _messageController.text.trim(),
+        'timestamp': FieldValue.serverTimestamp(),
+        'status': 'pending',
+        'createdAt': DateTime.now().toIso8601String(),
+      });
+
       setState(() {
-        submitted = true;
+        isLoading = false;
       });
-      Future.delayed(Duration(seconds: 3), () {
-        setState(() {
-          submitted = false;
-          patientName = '';
-          bloodGroup = '';
-          contactNumber = '';
-          location = '';
-          message = '';
-        });
+
+      _showMessage("Emergency request sent successfully!");
+
+      // Clear form
+      Future.delayed(const Duration(seconds: 1), () {
+        Navigator.pop(context);
       });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      _showMessage("Failed to send request. Please try again!", isError: true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    OutlineInputBorder roundedBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide.none,
+    );
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: Center(
-        child: Container(
-          constraints: BoxConstraints(maxWidth: 400, minHeight: 600),
-          margin: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(32),
-            boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
-          ),
-          child: Column(
-            children: [
-              // Header
-              Container(
-                padding: EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.red.shade500, Colors.red.shade600],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header updated with requested colors
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFFEF4444), // Bright red
+                    Color(0xFFDC2626), // Dark red
+                  ],
                 ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        IconButton(
-                          icon: Icon(LucideIcons.arrowLeft, color: Colors.white),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          'Emergency Request',
-                          style: TextStyle(
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.arrow_back,
                               color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold),
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Emergency Request',
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Send urgent blood request to nearby donors',
-                      style: TextStyle(color: Colors.red.shade100, fontSize: 14),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.warning_amber_rounded,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Fill the form below to send an emergency blood request',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                color: Colors.white.withOpacity(0.9),
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
+            ),
 
-              // Alert Banner
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                      color: Colors.orange.shade50,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.orange.shade200)),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(LucideIcons.alertCircle, color: Colors.orange.shade500),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Important Notice',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.orange.shade800),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              'Your request will be sent to all matching donors in your area. Please ensure all details are accurate.',
-                              style: TextStyle(
-                                  fontSize: 12, color: Colors.orange.shade700),
-                            ),
-                          ],
-                        ),
+            // Form
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Blood Type Selection
+                    Text(
+                      'Blood Type Required',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
                       ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Form / Success Message
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: submitted
-                      ? _successMessage()
-                      : Form(
-                          key: _formKey,
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                _buildTextField(
-                                    label: 'Patient Name',
-                                    icon: LucideIcons.user,
-                                    value: patientName,
-                                    onChanged: (val) => patientName = val,
-                                    validator: (val) =>
-                                        val!.isEmpty ? 'Required' : null),
-                                SizedBox(height: 12),
-                                _buildBloodGroupSelector(),
-                                SizedBox(height: 12),
-                                _buildTextField(
-                                    label: 'Contact Number',
-                                    icon: LucideIcons.phone,
-                                    value: contactNumber,
-                                    onChanged: (val) => contactNumber = val,
-                                    keyboardType: TextInputType.phone,
-                                    validator: (val) =>
-                                        val!.isEmpty ? 'Required' : null),
-                                SizedBox(height: 12),
-                                _buildTextField(
-                                    label: 'Hospital/Location',
-                                    icon: LucideIcons.mapPin,
-                                    value: location,
-                                    onChanged: (val) => location = val,
-                                    validator: (val) =>
-                                        val!.isEmpty ? 'Required' : null),
-                                SizedBox(height: 12),
-                                _buildTextField(
-                                  label: 'Additional Message',
-                                  icon: LucideIcons.droplet,
-                                  value: message,
-                                  onChanged: (val) => message = val,
-                                  maxLines: 4,
-                                  validator: (_) => null,
-                                ),
-                                SizedBox(height: 16),
-                                ElevatedButton.icon(
-                                  icon: Icon(LucideIcons.send),
-                                  label: Text('Send Emergency Request'),
-                                  style: ElevatedButton.styleFrom(
-                                    minimumSize: Size(double.infinity, 50),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(16)),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                  onPressed: handleSubmit,
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'By sending this request, you confirm that all information provided is accurate.',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 12, color: Colors.grey[600]),
-                                ),
-                                SizedBox(height: 16),
-                              ],
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: bloodTypes.map((type) {
+                        bool isSelected = selectedBloodType == type;
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedBloodType = type;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? const Color(0xFFFF5252)
+                                  : const Color(0xFFF5F5F5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected
+                                    ? const Color(0xFFFF5252)
+                                    : Colors.grey[300]!,
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Text(
+                              type,
+                              style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: isSelected ? Colors.white : Colors.black,
+                              ),
                             ),
                           ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Patient Name
+                    Text(
+                      'Patient Name',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _patientNameController,
+                      decoration: InputDecoration(
+                        hintText: 'Enter patient name',
+                        hintStyle: GoogleFonts.poppins(
+                          color: Colors.grey[600],
+                          fontSize: 14,
                         ),
-                ),
-              ),
+                        prefixIcon: const Icon(
+                          Icons.person_outline,
+                          color: Color(0xFFFF5252),
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFF5F5F5),
+                        border: roundedBorder,
+                        enabledBorder: roundedBorder,
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFFF5252),
+                            width: 2,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
 
-              // Footer Stats
-              if (!submitted)
-                Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                      border: Border(top: BorderSide(color: Colors.grey.shade200)),
-                      color: Colors.grey.shade50),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Column(
+                    // Hospital Name
+                    Text(
+                      'Hospital Name',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _hospitalController,
+                      decoration: InputDecoration(
+                        hintText: 'Enter hospital name',
+                        hintStyle: GoogleFonts.poppins(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.local_hospital_outlined,
+                          color: Color(0xFFFF5252),
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFF5F5F5),
+                        border: roundedBorder,
+                        enabledBorder: roundedBorder,
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFFF5252),
+                            width: 2,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Location
+                    Text(
+                      'Location',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _locationController,
+                      decoration: InputDecoration(
+                        hintText: 'Enter city/area',
+                        hintStyle: GoogleFonts.poppins(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.location_on_outlined,
+                          color: Color(0xFFFF5252),
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFF5F5F5),
+                        border: roundedBorder,
+                        enabledBorder: roundedBorder,
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFFF5252),
+                            width: 2,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Contact Number
+                    Text(
+                      'Contact Number',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _contactController,
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+                        hintText: '03XX XXXXXXX',
+                        hintStyle: GoogleFonts.poppins(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.phone_outlined,
+                          color: Color(0xFFFF5252),
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFF5F5F5),
+                        border: roundedBorder,
+                        enabledBorder: roundedBorder,
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFFF5252),
+                            width: 2,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Urgency Level
+                    Text(
+                      'Urgency Level',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: urgencyLevels.map((level) {
+                        bool isSelected = selectedUrgency == level;
+                        Color getColor() {
+                          if (level == "Critical") return Colors.red[700]!;
+                          if (level == "High") return const Color(0xFFFF5252);
+                          return Colors.orange;
+                        }
+
+                        return Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedUrgency = level;
+                                });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? getColor()
+                                      : const Color(0xFFF5F5F5),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? getColor()
+                                        : Colors.grey[300]!,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    level,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color:
+                                          isSelected ? Colors.white : Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Additional Message
+                    Text(
+                      'Additional Message (Optional)',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _messageController,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        hintText: 'Any additional details...',
+                        hintStyle: GoogleFonts.poppins(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFF5F5F5),
+                        border: roundedBorder,
+                        enabledBorder: roundedBorder,
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFFF5252),
+                            width: 2,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.all(16),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Submit Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: isLoading ? null : _submitRequest,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFF5252),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                          disabledBackgroundColor: Colors.grey[400],
+                        ),
+                        child: isLoading
+                            ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.send, color: Colors.white, size: 20),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Send Emergency Request',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Info Box
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF3E0),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: const Color(0xFFFFB74D),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('24/7',
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold)),
-                          Text('Service Available',
-                              style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          const Icon(
+                            Icons.info_outline,
+                            color: Color(0xFFFF9800),
+                            size: 24,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Your emergency request will be visible to all registered donors in your area. Please ensure all information is accurate.',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                color: const Color(0xFFE65100),
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
-                      Column(
-                        children: [
-                          Text('<10min',
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold)),
-                          Text('Avg Response Time',
-                              style: TextStyle(fontSize: 12, color: Colors.grey)),
-                        ],
-                      ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                 ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required String label,
-    required IconData icon,
-    required String value,
-    required Function(String) onChanged,
-    TextInputType keyboardType = TextInputType.text,
-    int maxLines = 1,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label,
-            style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[700])),
-        SizedBox(height: 4),
-        TextFormField(
-          initialValue: value,
-          onChanged: onChanged,
-          keyboardType: keyboardType,
-          maxLines: maxLines,
-          validator: validator,
-          decoration: InputDecoration(
-            prefixIcon: Icon(icon, color: Colors.grey[400]),
-            filled: true,
-            fillColor: Colors.grey[50],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: Colors.grey.shade200),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: Colors.red),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBloodGroupSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Required Blood Group',
-            style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[700])),
-        SizedBox(height: 6),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: bloodGroups.map((group) {
-            bool selected = bloodGroup == group;
-            return ChoiceChip(
-              label: Text(group,
-                  style: TextStyle(
-                      color: selected ? Colors.white : Colors.grey[700],
-                      fontWeight: FontWeight.w600)),
-              selected: selected,
-              selectedColor: Colors.red,
-              backgroundColor: Colors.grey[50],
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: Colors.grey.shade200)),
-              onSelected: (_) {
-                setState(() {
-                  bloodGroup = group;
-                });
-              },
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _successMessage() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                  color: Colors.green.shade100, shape: BoxShape.circle),
-              child: Icon(Icons.check, size: 40, color: Colors.green.shade500),
-            ),
-            SizedBox(height: 16),
-            Text('Request Sent!',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            SizedBox(height: 8),
-            Text(
-              'Your emergency request has been sent to nearby donors with $bloodGroup blood type.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey[700]),
-            ),
-            SizedBox(height: 16),
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                  color: Colors.green.shade50,
-                  borderRadius: BorderRadius.circular(16)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Next Steps:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green.shade800)),
-                  SizedBox(height: 6),
-                  Text('• Donors will be notified immediately', style: TextStyle(color: Colors.green.shade700)),
-                  Text('• Keep your phone accessible', style: TextStyle(color: Colors.green.shade700)),
-                  Text('• Donors will contact you directly', style: TextStyle(color: Colors.green.shade700)),
-                ],
               ),
-            )
+            ),
           ],
         ),
       ),

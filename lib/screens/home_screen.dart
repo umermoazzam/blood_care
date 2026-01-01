@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'donor_list.dart';
 import 'login_screen.dart';
 import 'be_donor_screen.dart';
+// ✅ STEP 1: Emergency screen import add kiya gaya
+import 'emergency_request.dart'; 
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -69,14 +71,13 @@ class _HomeScreenState extends State<HomeScreen> {
           body = _homeContent(userName);
         } else if (currentIndex == 1) {
           body = DonorListPage(
-  onBack: () {
-    setState(() {
-      currentIndex = 0;
-    });
-  },
-);
+            onBack: () {
+              setState(() {
+                currentIndex = 0;
+              });
+            },
+          );
         } else {
-          // Profile Section with red gradient background
           body = _profileContent(userName, userEmail);
         }
 
@@ -109,7 +110,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // 🔹 Profile Page UI with red gradient background
   Widget _profileContent(String userName, String userEmail) {
     return Container(
       decoration: const BoxDecoration(
@@ -131,15 +131,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       CircleAvatar(
                         radius: 60,
                         backgroundColor: Colors.white.withOpacity(0.3),
-                        child: Icon(Icons.person, size: 60, color: Colors.white),
+                        child: const Icon(Icons.person, size: 60, color: Colors.white),
                       ),
-                      Positioned(
+                      const Positioned(
                         bottom: 0,
                         right: 0,
                         child: CircleAvatar(
                           radius: 18,
                           backgroundColor: Colors.white,
-                          child: Icon(Icons.edit, size: 16, color: const Color(0xFFEF4444)),
+                          child: Icon(Icons.edit, size: 16, color: Color(0xFFEF4444)),
                         ),
                       )
                     ],
@@ -187,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.1), // Slight transparent white
+          color: Colors.white.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: ListTile(
@@ -278,8 +278,16 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
                 children: [
+                  // ✅ STEP 2: Emergency card ka onTap update kiya gaya
                   GestureDetector(
-                    onTap: () => print("Emergency tapped"),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const EmergencyRequestPage(),
+                        ),
+                      );
+                    },
                     child: _emergencyCard(),
                   ),
                   const SizedBox(height: 16),
