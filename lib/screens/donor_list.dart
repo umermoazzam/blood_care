@@ -1,10 +1,15 @@
 // donor_list.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore import added
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DonorListPage extends StatefulWidget {
-  const DonorListPage({Key? key}) : super(key: key);
+  final VoidCallback onBack;
+
+  const DonorListPage({
+    Key? key,
+    required this.onBack,
+  }) : super(key: key);
 
   @override
   State<DonorListPage> createState() => _DonorListPageState();
@@ -13,7 +18,7 @@ class DonorListPage extends StatefulWidget {
 class _DonorListPageState extends State<DonorListPage> {
   String selectedBloodType = "All";
   String selectedCity = "All Cities";
-  String searchQuery = ""; // Search functionality ke liye
+  String searchQuery = "";
 
   final List<String> bloodTypes = [
     "All", "A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"
@@ -27,6 +32,7 @@ class _DonorListPageState extends State<DonorListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Column(
           children: [
@@ -50,7 +56,7 @@ class _DonorListPageState extends State<DonorListPage> {
                         Row(
                           children: [
                             GestureDetector(
-                              onTap: () => Navigator.pop(context),
+                              onTap: widget.onBack,
                               child: CircleAvatar(
                                 radius: 20,
                                 backgroundColor: Colors.white.withOpacity(0.2),
@@ -132,7 +138,7 @@ class _DonorListPageState extends State<DonorListPage> {
                           });
                         },
                         child: Text(
-                          "Clear All",
+                          "",
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -166,7 +172,7 @@ class _DonorListPageState extends State<DonorListPage> {
             ),
 
             // Real-time Firestore Stream
-            Expanded(
+            Flexible(
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance.collection('donors').snapshots(),
                 builder: (context, snapshot) {
@@ -227,7 +233,12 @@ class _DonorListPageState extends State<DonorListPage> {
                       SizedBox(height: 16),
                       Expanded(
                         child: filteredDocs.isEmpty
-                            ? _emptyState()
+                            ? SingleChildScrollView(
+                                child: SizedBox(
+                                  height: MediaQuery.of(context).size.height * 0.4,
+                                  child: _emptyState(),
+                                ),
+                              )
                             : ListView.builder(
                                 padding: EdgeInsets.symmetric(horizontal: 24),
                                 itemCount: filteredDocs.length,
@@ -251,7 +262,6 @@ class _DonorListPageState extends State<DonorListPage> {
     );
   }
 
-  // --- UI Helpers (Unchanged) ---
   Widget _filterChip({required String label, required IconData icon, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
@@ -275,6 +285,9 @@ class _DonorListPageState extends State<DonorListPage> {
   }
 
   Widget _donorCard(Map<String, dynamic> donor) {
+    // UPDATED: Ensuring status is "Available" if 'available' field is true or missing
+    bool isAvailable = donor["available"] ?? true; 
+
     return Material(
       elevation: 2,
       borderRadius: BorderRadius.circular(16),
@@ -290,56 +303,102 @@ class _DonorListPageState extends State<DonorListPage> {
             Row(
               children: [
                 Container(
-                  width: 60, height: 60,
-                  decoration: BoxDecoration(color: Color(0xFFFEE2E2), borderRadius: BorderRadius.circular(12)),
+                  width: 60, 
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Color(0xFFFEE2E2), 
+                    borderRadius: BorderRadius.circular(12)
+                  ),
                   child: Center(
-                    child: Text(donor["bloodType"] ?? "",
-                        style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFFEF4444))),
+                    child: Text(
+                      donor["bloodType"] ?? "",
+                      style: GoogleFonts.poppins(
+                        fontSize: 18, 
+                        fontWeight: FontWeight.bold, 
+                        color: Color(0xFFEF4444)
+                      )
+                    ),
                   ),
                 ),
                 SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Row(
                         children: [
                           Expanded(
-                            child: Text(donor["name"] ?? "",
-                                style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+                            child: Text(
+                              donor["name"] ?? "",
+                              style: GoogleFonts.poppins(
+                                fontSize: 16, 
+                                fontWeight: FontWeight.w600
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: (donor["available"] ?? false) ? Color(0xFFDCFCE7) : Colors.grey[200],
+                              // GREEN for Available, GREY for Unavailable
+                              color: isAvailable ? Color(0xFFDCFCE7) : Colors.grey[200],
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              (donor["available"] ?? false) ? "Available" : "Unavailable",
+                              isAvailable ? "Available" : "Unavailable",
                               style: GoogleFonts.poppins(
-                                fontSize: 10, fontWeight: FontWeight.w600,
-                                color: (donor["available"] ?? false) ? Color(0xFF16A34A) : Colors.grey[600],
+                                fontSize: 10, 
+                                fontWeight: FontWeight.w600,
+                                color: isAvailable ? Color(0xFF16A34A) : Colors.grey[600],
                               ),
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 6),
+                      SizedBox(height: 4),
                       Row(
                         children: [
                           Icon(Icons.location_on, size: 14, color: Colors.grey[500]),
                           SizedBox(width: 4),
-                          Text(donor["city"] ?? "", style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600])),
+                          Flexible(
+                            child: Text(
+                              donor["city"] ?? "", 
+                              style: GoogleFonts.poppins(
+                                fontSize: 12, 
+                                color: Colors.grey[600]
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                           SizedBox(width: 12),
                           Icon(Icons.favorite, size: 14, color: Colors.grey[500]),
                           SizedBox(width: 4),
-                          Text("${donor['totalDonations'] ?? 0} donations",
-                              style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600])),
+                          Flexible(
+                            child: Text(
+                              "${donor['totalDonations'] ?? 0} donations",
+                              style: GoogleFonts.poppins(
+                                fontSize: 12, 
+                                color: Colors.grey[600]
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
-                      SizedBox(height: 4),
-                      Text("Last donation: ${donor['lastDonation'] ?? "N/A"}",
-                          style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey[500])),
+                      SizedBox(height: 2),
+                      Text(
+                        "Last donation: ${donor['lastDonation'] ?? "N/A"}",
+                        style: GoogleFonts.poppins(
+                          fontSize: 11, 
+                          color: Colors.grey[500]
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ],
                   ),
                 ),
@@ -350,17 +409,26 @@ class _DonorListPageState extends State<DonorListPage> {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {}, // Add call logic
+                    onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFEF4444),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: EdgeInsets.symmetric(vertical: 12),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.phone, size: 16, color: Colors.white),
                         SizedBox(width: 6),
-                        Text("Call Now", style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+                        Text(
+                          "Call Now", 
+                          style: GoogleFonts.poppins(
+                            fontSize: 13, 
+                            fontWeight: FontWeight.w600, 
+                            color: Colors.white
+                          )
+                        ),
                       ],
                     ),
                   ),
@@ -372,13 +440,22 @@ class _DonorListPageState extends State<DonorListPage> {
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(color: Color(0xFFEF4444)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: EdgeInsets.symmetric(vertical: 12),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.person, size: 16, color: Color(0xFFEF4444)),
                         SizedBox(width: 6),
-                        Text("View Profile", style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFFEF4444))),
+                        Text(
+                          "View Profile", 
+                          style: GoogleFonts.poppins(
+                            fontSize: 13, 
+                            fontWeight: FontWeight.w600, 
+                            color: Color(0xFFEF4444)
+                          )
+                        ),
                       ],
                     ),
                   ),
@@ -410,7 +487,6 @@ class _DonorListPageState extends State<DonorListPage> {
     );
   }
 
-  // --- Sheet Functions (UI Unchanged) ---
   void _showBloodTypeSheet() {
     showModalBottomSheet(
       context: context,

@@ -68,7 +68,13 @@ class _HomeScreenState extends State<HomeScreen> {
         if (currentIndex == 0) {
           body = _homeContent(userName);
         } else if (currentIndex == 1) {
-          body = const DonorListPage();
+          body = DonorListPage(
+  onBack: () {
+    setState(() {
+      currentIndex = 0;
+    });
+  },
+);
         } else {
           // Profile Section with red gradient background
           body = _profileContent(userName, userEmail);
