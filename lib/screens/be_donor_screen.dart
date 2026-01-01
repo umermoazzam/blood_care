@@ -121,21 +121,40 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      String userId = user?.uid ?? FirebaseFirestore.instance.collection('donors').doc().id;
+      // 🔥 CRITICAL FIX: Har baar NAYA unique ID generate karein
+      // .doc() bina parameter ke call karne se Firebase automatically unique ID deta hai
+      final docRef = FirebaseFirestore.instance.collection('donors').doc();
+      final String uniqueDonorId = docRef.id;
 
-      await FirebaseFirestore.instance.collection('donors').doc(userId).set({
+      print("🆔 Creating NEW donor with UNIQUE ID: $uniqueDonorId");
+      
+      // Current user ka reference (optional - agar user logged in hai)
+      final user = FirebaseAuth.instance.currentUser;
+      final String? userId = user?.uid;
+
+      print("👤 Current User ID (if logged in): $userId");
+
+      // ✅ FIXED: Har registration par NAYA document create hoga
+      await docRef.set({
         'name': _nameController.text.trim(),
         'phone': _phoneController.text.trim(),
         'email': _emailController.text.trim(),
-        'bloodGroup': _selectedBloodGroup,
+        'bloodType': _selectedBloodGroup,
         'age': int.parse(_ageController.text.trim()),
         'city': _cityController.text.trim(),
         'address': _addressController.text.trim(),
+        'available': true,
         'isDonor': true,
+        'totalDonations': 0,
+        'lastDonation': 'Never',
         'registeredAt': FieldValue.serverTimestamp(),
-        'lastDonation': null,
+        'donorId': uniqueDonorId,  // ✅ Unique donor ID
+        'userId': userId,  // ✅ User ID (agar logged in hai)
+        'createdBy': userId ?? 'anonymous',  // ✅ Who created this entry
       });
+
+      print("✅ Donor registered successfully with ID: $uniqueDonorId");
+      print("📊 This is a NEW entry, previous donors will remain in list");
 
       setState(() {
         _isLoading = false;
@@ -144,6 +163,7 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
 
       _showMessage("Registration successful! You are now a blood donor.");
     } catch (e) {
+      print("❌ Error registering donor: $e");
       setState(() => _isLoading = false);
       _showMessage("Registration failed: ${e.toString()}", isError: true);
     }

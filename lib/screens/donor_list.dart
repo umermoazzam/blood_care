@@ -126,22 +126,6 @@ class _DonorListPageState extends State<DonorListPage> {
                           color: Colors.grey[700],
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedBloodType = "All";
-                            selectedCity = "All Cities";
-                          });
-                        },
-                        child: Text(
-                          "",
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFEF4444),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                   SizedBox(height: 12),
@@ -168,6 +152,7 @@ class _DonorListPageState extends State<DonorListPage> {
             ),
             Flexible(
               child: StreamBuilder<QuerySnapshot>(
+                // Yeh stream donors collection ke tamaam docs fetch karegi
                 stream: FirebaseFirestore.instance.collection('donors').snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) return Center(child: Text("Error loading data"));
@@ -175,11 +160,12 @@ class _DonorListPageState extends State<DonorListPage> {
                     return Center(child: CircularProgressIndicator(color: Color(0xFFEF4444)));
                   }
 
+                  // Data filter logic
                   final filteredDocs = snapshot.data!.docs.where((doc) {
                     final data = doc.data() as Map<String, dynamic>;
                     bool bloodMatch = selectedBloodType == "All" || data["bloodType"] == selectedBloodType;
                     bool cityMatch = selectedCity == "All Cities" || data["city"] == selectedCity;
-                    bool nameMatch = data["name"].toString().toLowerCase().contains(searchQuery);
+                    bool nameMatch = (data["name"] ?? "").toString().toLowerCase().contains(searchQuery);
                     return bloodMatch && cityMatch && nameMatch;
                   }).toList();
 
@@ -303,7 +289,7 @@ class _DonorListPageState extends State<DonorListPage> {
                   ),
                   child: Center(
                     child: Text(
-                      donor["bloodType"] ?? "",
+                      donor["bloodType"] ?? "--", 
                       style: GoogleFonts.poppins(
                         fontSize: 18, 
                         fontWeight: FontWeight.bold, 
@@ -322,7 +308,7 @@ class _DonorListPageState extends State<DonorListPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              donor["name"] ?? "",
+                              donor["name"] ?? "Anonymous",
                               style: GoogleFonts.poppins(
                                 fontSize: 16, 
                                 fontWeight: FontWeight.w600
@@ -355,21 +341,7 @@ class _DonorListPageState extends State<DonorListPage> {
                           SizedBox(width: 4),
                           Flexible(
                             child: Text(
-                              donor["city"] ?? "", 
-                              style: GoogleFonts.poppins(
-                                fontSize: 12, 
-                                color: Colors.grey[600]
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          SizedBox(width: 12),
-                          Icon(Icons.favorite, size: 14, color: Colors.grey[500]),
-                          SizedBox(width: 4),
-                          Flexible(
-                            child: Text(
-                              "${donor['totalDonations'] ?? 0} donations",
+                              donor["city"] ?? "No City", 
                               style: GoogleFonts.poppins(
                                 fontSize: 12, 
                                 color: Colors.grey[600]
@@ -380,81 +352,136 @@ class _DonorListPageState extends State<DonorListPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 2),
-                      Text(
-                        "Last donation: ${donor['lastDonation'] ?? "N/A"}",
-                        style: GoogleFonts.poppins(
-                          fontSize: 11, 
-                          color: Colors.grey[500]
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
                     ],
                   ),
                 ),
               ],
             ),
             SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFEF4444),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.phone, size: 16, color: Colors.white),
-                        SizedBox(width: 6),
-                        Text(
-                          "Call Now", 
-                          style: GoogleFonts.poppins(
-                            fontSize: 13, 
-                            fontWeight: FontWeight.w600, 
-                            color: Colors.white
-                          )
-                        ),
-                      ],
-                    ),
-                  ),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () => _showDonorProfile(donor),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Color(0xFFEF4444)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  padding: EdgeInsets.symmetric(vertical: 12),
                 ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Color(0xFFEF4444)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      padding: EdgeInsets.symmetric(vertical: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.person, size: 16, color: Color(0xFFEF4444)),
+                    SizedBox(width: 8),
+                    Text(
+                      "View Profile", 
+                      style: GoogleFonts.poppins(
+                        fontSize: 13, 
+                        fontWeight: FontWeight.w600, 
+                        color: Color(0xFFEF4444)
+                      )
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.person, size: 16, color: Color(0xFFEF4444)),
-                        SizedBox(width: 6),
-                        Text(
-                          "View Profile", 
-                          style: GoogleFonts.poppins(
-                            fontSize: 13, 
-                            fontWeight: FontWeight.w600, 
-                            color: Color(0xFFEF4444)
-                          )
-                        ),
-                      ],
-                    ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showDonorProfile(Map<String, dynamic> donor) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        padding: EdgeInsets.fromLTRB(24, 24, 24, 16),
+        child: Column(
+          children: [
+            Center(
+              child: Container(
+                width: 40, height: 4,
+                decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+            SizedBox(height: 24),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 35,
+                          backgroundColor: Color(0xFFFEE2E2),
+                          child: Text(donor["bloodType"] ?? "?", style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFFEF4444))),
+                        ),
+                        SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(donor["name"] ?? "Unknown", style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold)),
+                              Text("Registered Donor", style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[600])),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 32),
+                    Text("Contact Information", style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+                    SizedBox(height: 16),
+                    _infoRow(Icons.phone, "Phone Number", donor["phone"] ?? "Not provided"),
+                    _infoRow(Icons.email, "Email Address", donor["email"] ?? "Not provided"),
+                    _infoRow(Icons.location_city, "City", donor["city"] ?? "Not provided"),
+                    _infoRow(Icons.cake, "Age", "${donor["age"] ?? "N/A"} years"),
+                    _infoRow(Icons.history, "Total Donations", "${donor["totalDonations"] ?? 0} times"),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFEF4444),
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Text("Close", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _infoRow(IconData icon, String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: Color(0xFFEF4444)),
+          SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey[500])),
+              Text(value, style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500)),
+            ],
+          )
+        ],
       ),
     );
   }
