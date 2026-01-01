@@ -1,4 +1,3 @@
-// login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'signup_screen.dart';
@@ -108,15 +107,11 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 16),
-                // Back Button (Jaise Signup mein hai)
                 InkWell(
                   onTap: () => Navigator.maybePop(context),
                   child: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
                 ),
-                
-                // Content start height (Symmetry with Signup Screen)
                 const SizedBox(height: 70), 
-                
                 Text(
                   'Welcome to Blood Care!',
                   style: GoogleFonts.poppins(
@@ -135,8 +130,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 40),
-
-                // Email Field
                 Text('Email',
                     style: GoogleFonts.poppins(
                         fontSize: 16, fontWeight: FontWeight.w600)),
@@ -158,8 +151,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Password Field
                 Text('Password',
                     style: GoogleFonts.poppins(
                         fontSize: 16, fontWeight: FontWeight.w600)),
@@ -181,8 +172,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // Forgot Password
                 Align(
                   alignment: Alignment.centerRight,
                   child: MouseRegion(
@@ -213,8 +202,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-
-                // Login Button
                 SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -241,8 +228,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Signup Link with press effect
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -276,7 +261,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24), // Extra bottom padding
+                const SizedBox(height: 24),
               ],
             ),
           ),

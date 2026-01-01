@@ -1,11 +1,9 @@
-// home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'donor_list.dart';
 import 'login_screen.dart';
 import 'be_donor_screen.dart';
-// ✅ STEP 1: Emergency screen import add kiya gaya
 import 'emergency_request.dart'; 
 
 class HomeScreen extends StatefulWidget {
@@ -16,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int currentIndex = 0; // 0 = Home, 1 = Donors, 2 = Profile
+  int currentIndex = 0;
 
   Future<String> _getUserName() async {
     await FirebaseAuth.instance.currentUser!.reload();
@@ -278,7 +276,6 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
                 children: [
-                  // ✅ STEP 2: Emergency card ka onTap update kiya gaya
                   GestureDetector(
                     onTap: () {
                       Navigator.push(

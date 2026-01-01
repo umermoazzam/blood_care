@@ -29,7 +29,6 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header with gradient
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -40,7 +39,6 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
               ),
               child: Column(
                 children: [
-                  // Top Bar
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
@@ -65,7 +63,6 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            // Share functionality
                             print("Share tapped");
                           },
                           child: CircleAvatar(
@@ -79,7 +76,6 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                     ),
                   ),
                   SizedBox(height: 16),
-                  // Profile Avatar
                   CircleAvatar(
                     radius: 50,
                     backgroundColor: Colors.white,
@@ -144,8 +140,6 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                 ],
               ),
             ),
-
-            // Blood Type Card
             Transform.translate(
               offset: Offset(0, -30),
               child: Padding(
@@ -170,8 +164,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                           height: 40,
                           color: Colors.grey[300],
                         ),
-                        _statsItem(
-                            'Donations', '12', Color(0xFF16A34A)),
+                        _statsItem('Donations', '12', Color(0xFF16A34A)),
                         Container(
                           width: 1,
                           height: 40,
@@ -184,15 +177,12 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                 ),
               ),
             ),
-
-            // Content
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Availability Toggle
                     Container(
                       padding: EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -268,10 +258,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                         ],
                       ),
                     ),
-
                     SizedBox(height: 24),
-
-                    // About Section
                     Text(
                       'ABOUT',
                       style: GoogleFonts.poppins(
@@ -290,10 +277,7 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                     SizedBox(height: 12),
                     _infoCard(Icons.calendar_today, 'Last Donation',
                         'Dec 15, 2024'),
-
                     SizedBox(height: 24),
-
-                    // Recent Activity
                     Text(
                       'DONATION HISTORY',
                       style: GoogleFonts.poppins(
@@ -309,14 +293,11 @@ class _DonorProfilePageState extends State<DonorProfilePage> {
                     _historyItem('City Medical Center', 'Oct 5, 2024'),
                     SizedBox(height: 12),
                     _historyItem('Emergency Blood Bank', 'Sep 12, 2024'),
-
                     SizedBox(height: 32),
                   ],
                 ),
               ),
             ),
-
-            // Bottom Action Buttons
             Container(
               padding: EdgeInsets.all(24),
               decoration: BoxDecoration(

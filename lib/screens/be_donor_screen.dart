@@ -1,8 +1,7 @@
-// be_donor_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Uncommented
-import 'package:cloud_firestore/cloud_firestore.dart'; // Uncommented
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BeDonorScreen extends StatefulWidget {
   const BeDonorScreen({Key? key}) : super(key: key);
@@ -122,12 +121,7 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Real Firebase Implementation
       final user = FirebaseAuth.instance.currentUser;
-      
-      // Agar user login nahi hai, tab bhi hum data store kar sakte hain 
-      // ya phir auto-generated ID use kar sakte hain agar aap registration compulsory nahi rakhna chahte.
-      // Yahan hum user UID use kar rahe hain (best practice)
       String userId = user?.uid ?? FirebaseFirestore.instance.collection('donors').doc().id;
 
       await FirebaseFirestore.instance.collection('donors').doc(userId).set({
@@ -173,10 +167,7 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFEF4444),
-                    Color(0xFFDC2626),
-                  ],
+                  colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
                 ),
               ),
               padding: const EdgeInsets.all(24.0),
@@ -192,11 +183,7 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                         color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        size: 24,
-                        color: Colors.white,
-                      ),
+                      child: const Icon(Icons.arrow_back, size: 24, color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -229,14 +216,7 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                       ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Full Name',
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
+                            Text('Full Name', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black)),
                             const SizedBox(height: 8),
                             TextField(
                               controller: _nameController,
@@ -244,30 +224,17 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               style: const TextStyle(fontSize: 15),
                               decoration: InputDecoration(
                                 hintText: 'Enter your full name',
-                                hintStyle: GoogleFonts.poppins(
-                                  color: Colors.grey[600],
-                                  fontSize: 14,
-                                ),
+                                hintStyle: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
                                 filled: true,
                                 fillColor: const Color(0xFFF5F5F5),
                                 border: roundedBorder,
                                 enabledBorder: roundedBorder,
                                 focusedBorder: roundedBorder,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
-                                ),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                               ),
                             ),
                             const SizedBox(height: 20),
-                            Text(
-                              'Phone Number',
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
+                            Text('Phone Number', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black)),
                             const SizedBox(height: 8),
                             TextField(
                               controller: _phoneController,
@@ -275,30 +242,17 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               style: const TextStyle(fontSize: 15),
                               decoration: InputDecoration(
                                 hintText: '03XX XXXXXXX',
-                                hintStyle: GoogleFonts.poppins(
-                                  color: Colors.grey[600],
-                                  fontSize: 14,
-                                ),
+                                hintStyle: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
                                 filled: true,
                                 fillColor: const Color(0xFFF5F5F5),
                                 border: roundedBorder,
                                 enabledBorder: roundedBorder,
                                 focusedBorder: roundedBorder,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
-                                ),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                               ),
                             ),
                             const SizedBox(height: 20),
-                            Text(
-                              'Email Address',
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
+                            Text('Email Address', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black)),
                             const SizedBox(height: 8),
                             TextField(
                               controller: _emailController,
@@ -306,58 +260,30 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               style: const TextStyle(fontSize: 15),
                               decoration: InputDecoration(
                                 hintText: 'example@email.com',
-                                hintStyle: GoogleFonts.poppins(
-                                  color: Colors.grey[600],
-                                  fontSize: 14,
-                                ),
+                                hintStyle: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
                                 filled: true,
                                 fillColor: const Color(0xFFF5F5F5),
                                 border: roundedBorder,
                                 enabledBorder: roundedBorder,
                                 focusedBorder: roundedBorder,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
-                                ),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                               ),
                             ),
                             const SizedBox(height: 20),
-                            Text(
-                              'Blood Group',
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
+                            Text('Blood Group', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black)),
                             const SizedBox(height: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF5F5F5),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                              decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(12)),
                               child: DropdownButtonHideUnderline(
                                 child: DropdownButton<String>(
                                   value: _selectedBloodGroup,
-                                  hint: Text(
-                                    'Select your blood group',
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.grey[600],
-                                      fontSize: 14,
-                                    ),
-                                  ),
+                                  hint: Text('Select your blood group', style: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14)),
                                   isExpanded: true,
                                   icon: const Icon(Icons.arrow_drop_down, color: Colors.black),
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 15,
-                                    color: Colors.black,
-                                  ),
+                                  style: GoogleFonts.poppins(fontSize: 15, color: Colors.black),
                                   items: _bloodGroups.map((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
+                                    return DropdownMenuItem<String>(value: value, child: Text(value));
                                   }).toList(),
                                   onChanged: (String? newValue) {
                                     setState(() {
@@ -368,14 +294,7 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               ),
                             ),
                             const SizedBox(height: 20),
-                            Text(
-                              'Age',
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
+                            Text('Age', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black)),
                             const SizedBox(height: 8),
                             TextField(
                               controller: _ageController,
@@ -383,30 +302,17 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               style: const TextStyle(fontSize: 15),
                               decoration: InputDecoration(
                                 hintText: 'Enter your age (18-65)',
-                                hintStyle: GoogleFonts.poppins(
-                                  color: Colors.grey[600],
-                                  fontSize: 14,
-                                ),
+                                hintStyle: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
                                 filled: true,
                                 fillColor: const Color(0xFFF5F5F5),
                                 border: roundedBorder,
                                 enabledBorder: roundedBorder,
                                 focusedBorder: roundedBorder,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
-                                ),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                               ),
                             ),
                             const SizedBox(height: 20),
-                            Text(
-                              'City',
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
+                            Text('City', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black)),
                             const SizedBox(height: 8),
                             TextField(
                               controller: _cityController,
@@ -414,30 +320,17 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               style: const TextStyle(fontSize: 15),
                               decoration: InputDecoration(
                                 hintText: 'Enter your city',
-                                hintStyle: GoogleFonts.poppins(
-                                  color: Colors.grey[600],
-                                  fontSize: 14,
-                                ),
+                                hintStyle: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
                                 filled: true,
                                 fillColor: const Color(0xFFF5F5F5),
                                 border: roundedBorder,
                                 enabledBorder: roundedBorder,
                                 focusedBorder: roundedBorder,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
-                                ),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                               ),
                             ),
                             const SizedBox(height: 20),
-                            Text(
-                              'Address',
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
+                            Text('Address', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black)),
                             const SizedBox(height: 8),
                             TextField(
                               controller: _addressController,
@@ -446,19 +339,13 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               style: const TextStyle(fontSize: 15),
                               decoration: InputDecoration(
                                 hintText: 'Enter your complete address',
-                                hintStyle: GoogleFonts.poppins(
-                                  color: Colors.grey[600],
-                                  fontSize: 14,
-                                ),
+                                hintStyle: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 14),
                                 filled: true,
                                 fillColor: const Color(0xFFF5F5F5),
                                 border: roundedBorder,
                                 enabledBorder: roundedBorder,
                                 focusedBorder: roundedBorder,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
-                                ),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                               ),
                             ),
                             const SizedBox(height: 32),
@@ -470,27 +357,16 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFFF5252),
                                   foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                   elevation: 0,
                                 ),
                                 child: _isLoading
                                     ? const SizedBox(
                                         height: 20,
                                         width: 20,
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                          strokeWidth: 2,
-                                        ),
+                                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                       )
-                                    : Text(
-                                        'Register as Donor',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
+                                    : Text('Register as Donor', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
                               ),
                             ),
                             const SizedBox(height: 24),
@@ -504,19 +380,12 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(
-                                    Icons.info_outline,
-                                    color: Color(0xFFFF5252),
-                                    size: 24,
-                                  ),
+                                  const Icon(Icons.info_outline, color: Color(0xFFFF5252), size: 24),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
                                       'Donor Eligibility: You must be 18-65 years old, weigh above 50kg, and be in good health.',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 12,
-                                        color: Colors.grey[700],
-                                      ),
+                                      style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[700]),
                                     ),
                                   ),
                                 ],
@@ -541,37 +410,18 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
         Container(
           width: 100,
           height: 100,
-          decoration: const BoxDecoration(
-            color: Color(0xFF16A34A),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.check,
-            color: Colors.white,
-            size: 60,
-          ),
+          decoration: const BoxDecoration(color: Color(0xFF16A34A), shape: BoxShape.circle),
+          child: const Icon(Icons.check, color: Colors.white, size: 60),
         ),
         const SizedBox(height: 32),
-        Text(
-          'Registration Successful!',
-          textAlign: TextAlign.center,
-          style: GoogleFonts.poppins(
-            fontSize: 28,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-        ),
+        Text('Registration Successful!', textAlign: TextAlign.center, style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.w600, color: Colors.black)),
         const SizedBox(height: 16),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
             'Thank you for registering as a blood donor! You are now part of our lifesaving community.',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: Colors.grey,
-              height: 1.5,
-            ),
+            style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey, height: 1.5),
           ),
         ),
         const SizedBox(height: 32),
@@ -591,40 +441,17 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
                   Container(
                     width: 60,
                     height: 60,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFF5252),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    decoration: BoxDecoration(color: const Color(0xFFFF5252), borderRadius: BorderRadius.circular(12)),
                     child: Center(
-                      child: Text(
-                        _selectedBloodGroup ?? '',
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: Text(_selectedBloodGroup ?? '', style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        _nameController.text.trim(),
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        _cityController.text.trim(),
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                        ),
-                      ),
+                      Text(_nameController.text.trim(), style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black)),
+                      Text(_cityController.text.trim(), style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[700])),
                     ],
                   ),
                 ],
@@ -643,18 +470,10 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF5252),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 elevation: 0,
               ),
-              child: Text(
-                'Back to Home',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              child: Text('Back to Home', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
             ),
           ),
         ),

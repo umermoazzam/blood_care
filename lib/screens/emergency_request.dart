@@ -75,7 +75,6 @@ class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
   }
 
   Future<void> _submitRequest() async {
-    // Validation
     if (selectedBloodType.isEmpty) {
       _showMessage("Please select a blood type!", isError: true);
       return;
@@ -111,7 +110,6 @@ class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
     });
 
     try {
-      // Save to Firestore
       await FirebaseFirestore.instance.collection('emergency_requests').add({
         'patientName': _patientNameController.text.trim(),
         'bloodType': selectedBloodType,
@@ -130,8 +128,6 @@ class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
       });
 
       _showMessage("Emergency request sent successfully!");
-
-      // Clear form
       Future.delayed(const Duration(seconds: 1), () {
         Navigator.pop(context);
       });
@@ -155,15 +151,14 @@ class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header updated with requested colors
             Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFFEF4444), // Bright red
-                    Color(0xFFDC2626), // Dark red
+                    Color(0xFFEF4444),
+                    Color(0xFFDC2626),
                   ],
                 ),
               ),
@@ -233,15 +228,12 @@ class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
                 ),
               ),
             ),
-
-            // Form
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Blood Type Selection
                     Text(
                       'Blood Type Required',
                       style: GoogleFonts.poppins(
@@ -292,8 +284,6 @@ class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
                       }).toList(),
                     ),
                     const SizedBox(height: 24),
-
-                    // Patient Name
                     Text(
                       'Patient Name',
                       style: GoogleFonts.poppins(
@@ -333,8 +323,6 @@ class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-
-                    // Hospital Name
                     Text(
                       'Hospital Name',
                       style: GoogleFonts.poppins(
@@ -374,8 +362,6 @@ class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-
-                    // Location
                     Text(
                       'Location',
                       style: GoogleFonts.poppins(
@@ -415,8 +401,6 @@ class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-
-                    // Contact Number
                     Text(
                       'Contact Number',
                       style: GoogleFonts.poppins(
@@ -457,8 +441,6 @@ class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-
-                    // Urgency Level
                     Text(
                       'Urgency Level',
                       style: GoogleFonts.poppins(
@@ -518,8 +500,6 @@ class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
                       }).toList(),
                     ),
                     const SizedBox(height: 20),
-
-                    // Additional Message
                     Text(
                       'Additional Message (Optional)',
                       style: GoogleFonts.poppins(
@@ -553,8 +533,6 @@ class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
                       ),
                     ),
                     const SizedBox(height: 32),
-
-                    // Submit Button
                     SizedBox(
                       width: double.infinity,
                       height: 56,
@@ -595,8 +573,6 @@ class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-
-                    // Info Box
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(

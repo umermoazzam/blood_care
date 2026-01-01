@@ -1,7 +1,6 @@
-// forgot_password_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Firebase import
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
@@ -12,7 +11,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance; // FirebaseAuth instance
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isLoading = false;
   bool _emailSent = false;
 
@@ -84,7 +83,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Firebase Implementation
       await _auth.sendPasswordResetEmail(email: email);
       setState(() {
         _isLoading = false;
@@ -158,7 +156,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Back Button
                 InkWell(
                   onTap: () => Navigator.pop(context),
                   borderRadius: BorderRadius.circular(8),
@@ -168,8 +165,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-
-                // Title
                 Text(
                   'Forgot Password',
                   style: GoogleFonts.poppins(
@@ -179,8 +174,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-
-                // Subtitle
                 Text(
                   _emailSent
                       ? 'Check your email for a password reset link'
@@ -193,9 +186,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 40),
-
                 if (!_emailSent) ...[
-                  // Email Input Field
                   Text(
                     'Email Address',
                     style: GoogleFonts.poppins(
@@ -227,8 +218,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Send Reset Link Button
                   SizedBox(
                     width: double.infinity,
                     height: 56,
@@ -261,8 +250,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Remember Password Link
                   Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -289,8 +276,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                   const SizedBox(height: 40),
-
-                  // Info Card
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -320,7 +305,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                 ] else ...[
-                  // Email Sent Success State
                   Center(
                     child: Column(
                       children: [
@@ -369,8 +353,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                   const SizedBox(height: 40),
-
-                  // Next Steps
                   Text(
                     'Next Steps:',
                     style: GoogleFonts.poppins(
@@ -380,7 +362,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   _buildStepItem('1', 'Check your email inbox'),
                   const SizedBox(height: 12),
                   _buildStepItem('2', 'Click the reset link in the email'),
@@ -389,8 +370,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   const SizedBox(height: 12),
                   _buildStepItem('4', 'Login with your new password'),
                   const SizedBox(height: 32),
-
-                  // Resend Email
                   Center(
                     child: TextButton(
                       onPressed: _isLoading ? null : _resendEmail,
@@ -405,8 +384,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Back to Login Button
                   SizedBox(
                     width: double.infinity,
                     height: 56,
@@ -429,8 +406,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                   const SizedBox(height: 40),
-
-                  // Info Card
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(

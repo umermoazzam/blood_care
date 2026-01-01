@@ -1,8 +1,7 @@
-// signup_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // 🔹 Added for Firestore
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -69,18 +68,15 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // 1️⃣ Create user in Firebase Auth
       UserCredential userCred =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // 2️⃣ Update display name in Auth (optional)
       await userCred.user!.updateDisplayName(name);
       await userCred.user!.reload();
 
-      // 3️⃣ 🔹 Save user data to Firestore
       String uid = userCred.user!.uid;
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
         'name': name,
@@ -88,7 +84,6 @@ class _SignupScreenState extends State<SignupScreen> {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      // Navigate back or to Home Screen
       Navigator.pop(context, true);
     } on FirebaseAuthException catch (e) {
       _showErrorMessage("Signup failed: ${e.message}");
@@ -148,8 +143,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 const SizedBox(height: 40),
-
-                // Name
                 Text('Name',
                     style: GoogleFonts.poppins(
                         fontSize: 16, fontWeight: FontWeight.w600)),
@@ -170,8 +163,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Email
                 Text('Email',
                     style: GoogleFonts.poppins(
                         fontSize: 16, fontWeight: FontWeight.w600)),
@@ -193,8 +184,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Password
                 Text('Password',
                     style: GoogleFonts.poppins(
                         fontSize: 16, fontWeight: FontWeight.w600)),
@@ -216,8 +205,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-
-                // Sign Up Button
                 SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -240,10 +227,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
-                // 🔽 Login link with press effect
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

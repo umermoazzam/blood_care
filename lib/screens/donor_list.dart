@@ -1,4 +1,3 @@
-// donor_list.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,7 +35,6 @@ class _DonorListPageState extends State<DonorListPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -112,8 +110,6 @@ class _DonorListPageState extends State<DonorListPage> {
                 ),
               ),
             ),
-
-            // Filter Chips
             Container(
               padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
               child: Column(
@@ -170,8 +166,6 @@ class _DonorListPageState extends State<DonorListPage> {
                 ],
               ),
             ),
-
-            // Real-time Firestore Stream
             Flexible(
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance.collection('donors').snapshots(),
@@ -181,7 +175,6 @@ class _DonorListPageState extends State<DonorListPage> {
                     return Center(child: CircularProgressIndicator(color: Color(0xFFEF4444)));
                   }
 
-                  // Client-side filtering
                   final filteredDocs = snapshot.data!.docs.where((doc) {
                     final data = doc.data() as Map<String, dynamic>;
                     bool bloodMatch = selectedBloodType == "All" || data["bloodType"] == selectedBloodType;
@@ -285,7 +278,6 @@ class _DonorListPageState extends State<DonorListPage> {
   }
 
   Widget _donorCard(Map<String, dynamic> donor) {
-    // UPDATED: Ensuring status is "Available" if 'available' field is true or missing
     bool isAvailable = donor["available"] ?? true; 
 
     return Material(
@@ -342,7 +334,6 @@ class _DonorListPageState extends State<DonorListPage> {
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              // GREEN for Available, GREY for Unavailable
                               color: isAvailable ? Color(0xFFDCFCE7) : Colors.grey[200],
                               borderRadius: BorderRadius.circular(12),
                             ),
