@@ -12,7 +12,20 @@
           "package_name": "com.example.blood_care"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "241745573264-fl2mh976k4g0j3vjtej8fied06l6p94g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.blood_care",
+            "certificate_hash": "145f4e2a4b4d2103924c4357ede82345d788c77e"
+          }
+        },
+        {
+          "client_id": "241745573264-gbdjk3pr983v94hg9nl5n4f2esa778vt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDGuXiOBJTWH-rVcEzwq4_3OFU4TsJ8cMQ"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "241745573264-gbdjk3pr983v94hg9nl5n4f2esa778vt.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "241745573264-gio94qeb33anfe60cohpd8ubg8pp4jgq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.bloodCare"
+              }
+            }
+          ]
         }
       }
     }
