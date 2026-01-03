@@ -1,3 +1,4 @@
+// signup_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,6 +17,9 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+
+  // ✅ Password visibility toggle
+  bool _obscurePassword = true;
 
   void _showErrorMessage(String message) {
     showDialog(
@@ -143,6 +147,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 const SizedBox(height: 40),
+
+                /// Name
                 Text('Name',
                     style: GoogleFonts.poppins(
                         fontSize: 16, fontWeight: FontWeight.w600)),
@@ -163,6 +169,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
+
+                /// Email
                 Text('Email',
                     style: GoogleFonts.poppins(
                         fontSize: 16, fontWeight: FontWeight.w600)),
@@ -184,13 +192,15 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
+
+                /// Password
                 Text('Password',
                     style: GoogleFonts.poppins(
                         fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _passwordController,
-                  obscureText: true,
+                  obscureText: _obscurePassword, // ✅ toggle
                   decoration: InputDecoration(
                     hintText: 'Password',
                     hintStyle: GoogleFonts.poppins(
@@ -202,9 +212,25 @@ class _SignupScreenState extends State<SignupScreen> {
                     focusedBorder: roundedBorder,
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 16),
+                    // ✅ Eye icon
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey[700],
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
                   ),
                 ),
                 const SizedBox(height: 32),
+
+                /// Sign Up Button
                 SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -228,6 +254,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
+
+                /// Already have account?
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -262,6 +290,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 24),
               ],
             ),
           ),
