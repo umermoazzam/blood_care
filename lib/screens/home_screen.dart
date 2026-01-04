@@ -15,10 +15,21 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int currentIndex = 0;
+  String _cachedUserName = "User";
+  String _cachedUserEmail = "Email not found";
 
-  Future<String> _getUserName() async {
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
     await FirebaseAuth.instance.currentUser!.reload();
-    return FirebaseAuth.instance.currentUser?.displayName ?? "User";
+    setState(() {
+      _cachedUserName = FirebaseAuth.instance.currentUser?.displayName ?? "User";
+      _cachedUserEmail = FirebaseAuth.instance.currentUser?.email ?? "Email not found";
+    });
   }
 
   void _showLogoutDialog(BuildContext context) {
@@ -58,53 +69,63 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-      future: _getUserName(),
-      builder: (context, snapshot) {
-        String userName = snapshot.data ?? "User";
-        String userEmail = FirebaseAuth.instance.currentUser?.email ?? "Email not found";
-
-        Widget body;
-        if (currentIndex == 0) {
-          body = _homeContent(userName);
-        } else if (currentIndex == 1) {
-          body = DonorListPage(
-            onBack: () {
-              setState(() {
-                currentIndex = 0;
-              });
-            },
-          );
-        } else {
-          body = _profileContent(userName, userEmail);
+    return WillPopScope(
+      onWillPop: () async {
+        if (currentIndex != 0) {
+          setState(() {
+            currentIndex = 0;
+          });
+          return false;
         }
-
-        return Scaffold(
-          backgroundColor: Colors.grey[50],
-          body: body,
-          bottomNavigationBar: Container(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: Colors.grey[200]!)),
+        return true;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.grey[50],
+        body: IndexedStack(
+          index: currentIndex,
+          children: [
+            _homeContent(_cachedUserName),
+            DonorListPage(
+              onBack: () {
+                setState(() {
+                  currentIndex = 0;
+                });
+              },
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                GestureDetector(
+            _profileContent(_cachedUserName, _cachedUserEmail),
+          ],
+        ),
+        bottomNavigationBar: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(top: BorderSide(color: Colors.grey[200]!)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
                     onTap: () => setState(() => currentIndex = 0),
                     child: _navItem(Icons.home, "Home", currentIndex == 0)),
-                GestureDetector(
+              ),
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
                     onTap: () => setState(() => currentIndex = 1),
                     child: _navItem(Icons.favorite_border, "Donors", currentIndex == 1)),
-                GestureDetector(
+              ),
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
                     onTap: () => setState(() => currentIndex = 2),
                     child: _navItem(Icons.person_outline, "Profile", currentIndex == 2)),
-              ],
-            ),
+              ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -131,13 +152,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         backgroundColor: Colors.white.withOpacity(0.3),
                         child: const Icon(Icons.person, size: 60, color: Colors.white),
                       ),
-                      const Positioned(
+                      Positioned(
                         bottom: 0,
                         right: 0,
-                        child: CircleAvatar(
-                          radius: 18,
-                          backgroundColor: Colors.white,
-                          child: Icon(Icons.edit, size: 16, color: Color(0xFFEF4444)),
+                        child: MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () {},
+                            child: const CircleAvatar(
+                              radius: 18,
+                              backgroundColor: Colors.white,
+                              child: Icon(Icons.edit, size: 16, color: Color(0xFFEF4444)),
+                            ),
+                          ),
                         ),
                       )
                     ],
@@ -183,18 +210,21 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _profileMenuTile(IconData icon, String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: ListTile(
-          leading: Icon(icon, color: Colors.white, size: 22),
-          title: Text(title,
-              style: GoogleFonts.poppins(
-                  fontSize: 15, fontWeight: FontWeight.w500, color: Colors.white)),
-          trailing: const Icon(Icons.chevron_right, size: 20, color: Colors.white),
-          onTap: () {},
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ListTile(
+            leading: Icon(icon, color: Colors.white, size: 22),
+            title: Text(title,
+                style: GoogleFonts.poppins(
+                    fontSize: 15, fontWeight: FontWeight.w500, color: Colors.white)),
+            trailing: const Icon(Icons.chevron_right, size: 20, color: Colors.white),
+            onTap: () {},
+          ),
         ),
       ),
     );
@@ -245,12 +275,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
-                      GestureDetector(
-                        onTap: () => _showLogoutDialog(context),
-                        child: CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Colors.white.withOpacity(0.2),
-                          child: const Icon(Icons.logout, color: Colors.white, size: 18),
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () => _showLogoutDialog(context),
+                          child: CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Colors.white.withOpacity(0.2),
+                            child: const Icon(Icons.logout, color: Colors.white, size: 18),
+                          ),
                         ),
                       ),
                     ],
@@ -276,36 +309,47 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const EmergencyRequestPage(),
-                        ),
-                      );
-                    },
-                    child: _emergencyCard(),
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const EmergencyRequestPage(),
+                          ),
+                        );
+                      },
+                      child: _emergencyCard(),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
-                        child: GestureDetector(
-                          onTap: () => setState(() => currentIndex = 1),
-                          child: _actionCard(Icons.search, "Find Donor", "Search nearby"),
+                        child: MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() => currentIndex = 1);
+                            },
+                            child: _actionCard(Icons.search, "Find Donor", "Search nearby"),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const BeDonorScreen()),
-                            );
-                          },
-                          child: _actionCard(Icons.favorite_border, "Be a Donor", "Register now"),
+                        child: MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const BeDonorScreen()),
+                              );
+                            },
+                            child: _actionCard(Icons.favorite_border, "Be a Donor", "Register now"),
+                          ),
                         ),
                       ),
                     ],

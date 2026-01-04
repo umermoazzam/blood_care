@@ -19,6 +19,7 @@ class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
   String selectedBloodType = "";
   String selectedUrgency = "High";
   bool isLoading = false;
+  bool isBackHovered = false; // Hover effect track karne ke liye
 
   final List<String> bloodTypes = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
   final List<String> urgencyLevels = ["High", "Medium", "Critical"];
@@ -168,18 +169,27 @@ class _EmergencyRequestPageState extends State<EmergencyRequestPage> {
                   children: [
                     Row(
                       children: [
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(
-                              Icons.arrow_back,
-                              color: Colors.white,
-                              size: 24,
+                        // Back Button with Hover Effect and Pointer
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          onEnter: (_) => setState(() => isBackHovered = true),
+                          onExit: (_) => setState(() => isBackHovered = false),
+                          child: GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: isBackHovered 
+                                    ? Colors.white.withOpacity(0.3) 
+                                    : Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                                size: 24,
+                              ),
                             ),
                           ),
                         ),

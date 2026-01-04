@@ -19,8 +19,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isLoading = false;
   bool _isHoveringForgot = false;
-
-  // ✅ NEW: password visibility control
   bool _obscurePassword = true;
 
   void _showMessage(String message) {
@@ -79,9 +77,12 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (!mounted) return;
-      Navigator.pushReplacement(
+      
+      // Navigate and remove all previous routes
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
+        (route) => false,
       );
     } on FirebaseAuthException catch (e) {
       _showMessage("Login failed: ${e.message}");
@@ -113,11 +114,10 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Back button removed, but height kept same to prevent layout shift
                 const SizedBox(height: 16),
-                InkWell(
-                  onTap: () => Navigator.maybePop(context),
-                  child: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
-                ),
+                const SizedBox(height: 24), // Placeholder for the 24px icon height
+                
                 const SizedBox(height: 70),
                 Text(
                   'Welcome to Blood Care!',
@@ -181,8 +181,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     focusedBorder: roundedBorder,
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 16),
-
-                    // ✅ Eye icon added
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword

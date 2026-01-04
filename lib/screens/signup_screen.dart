@@ -17,8 +17,6 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
-
-  // ✅ Password visibility toggle
   bool _obscurePassword = true;
 
   void _showErrorMessage(String message) {
@@ -88,13 +86,19 @@ class _SignupScreenState extends State<SignupScreen> {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
+      // Sign out user after signup (security measure)
+      await FirebaseAuth.instance.signOut();
+      
+      if (!mounted) return;
+      
+      // Return to login with success flag
       Navigator.pop(context, true);
     } on FirebaseAuthException catch (e) {
       _showErrorMessage("Signup failed: ${e.message}");
     } catch (e) {
       _showErrorMessage("Something went wrong. Please try again.");
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -200,7 +204,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: _passwordController,
-                  obscureText: _obscurePassword, // ✅ toggle
+                  obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     hintText: 'Password',
                     hintStyle: GoogleFonts.poppins(
@@ -212,7 +216,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     focusedBorder: roundedBorder,
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 16),
-                    // ✅ Eye icon
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword

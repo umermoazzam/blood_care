@@ -14,10 +14,11 @@ class DonorListPage extends StatefulWidget {
   State<DonorListPage> createState() => _DonorListPageState();
 }
 
-class _DonorListPageState extends State<DonorListPage> {
+class _DonorListPageState extends State<DonorListPage> with AutomaticKeepAliveClientMixin {
   String selectedBloodType = "All";
   String selectedCity = "All Cities";
   String searchQuery = "";
+  final ScrollController _scrollController = ScrollController();
 
   final List<String> bloodTypes = [
     "All", "A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"
@@ -28,7 +29,18 @@ class _DonorListPageState extends State<DonorListPage> {
   ];
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // Important for AutomaticKeepAliveClientMixin
+    
     return Scaffold(
       backgroundColor: Colors.grey[50],
       resizeToAvoidBottomInset: true,
@@ -53,12 +65,15 @@ class _DonorListPageState extends State<DonorListPage> {
                       children: [
                         Row(
                           children: [
-                            GestureDetector(
-                              onTap: widget.onBack,
-                              child: CircleAvatar(
-                                radius: 20,
-                                backgroundColor: Colors.white.withOpacity(0.2),
-                                child: Icon(Icons.arrow_back, color: Colors.white, size: 20),
+                            MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: GestureDetector(
+                                onTap: widget.onBack,
+                                child: CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: Colors.white.withOpacity(0.2),
+                                  child: Icon(Icons.arrow_back, color: Colors.white, size: 20),
+                                ),
                               ),
                             ),
                             SizedBox(width: 12),
@@ -71,12 +86,15 @@ class _DonorListPageState extends State<DonorListPage> {
                             ),
                           ],
                         ),
-                        GestureDetector(
-                          onTap: () => _showFilterSheet(),
-                          child: CircleAvatar(
-                            radius: 20,
-                            backgroundColor: Colors.white.withOpacity(0.2),
-                            child: Icon(Icons.filter_list, color: Colors.white, size: 20),
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () => _showFilterSheet(),
+                            child: CircleAvatar(
+                              radius: 20,
+                              backgroundColor: Colors.white.withOpacity(0.2),
+                              child: Icon(Icons.filter_list, color: Colors.white, size: 20),
+                            ),
                           ),
                         ),
                       ],
@@ -152,7 +170,6 @@ class _DonorListPageState extends State<DonorListPage> {
             ),
             Flexible(
               child: StreamBuilder<QuerySnapshot>(
-                // Yeh stream donors collection ke tamaam docs fetch karegi
                 stream: FirebaseFirestore.instance.collection('donors').snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) return Center(child: Text("Error loading data"));
@@ -160,7 +177,6 @@ class _DonorListPageState extends State<DonorListPage> {
                     return Center(child: CircularProgressIndicator(color: Color(0xFFEF4444)));
                   }
 
-                  // Data filter logic
                   final filteredDocs = snapshot.data!.docs.where((doc) {
                     final data = doc.data() as Map<String, dynamic>;
                     bool bloodMatch = selectedBloodType == "All" || data["bloodType"] == selectedBloodType;
@@ -219,6 +235,7 @@ class _DonorListPageState extends State<DonorListPage> {
                                 ),
                               )
                             : ListView.builder(
+                                controller: _scrollController,
                                 padding: EdgeInsets.symmetric(horizontal: 24),
                                 itemCount: filteredDocs.length,
                                 itemBuilder: (context, index) {
@@ -242,22 +259,25 @@ class _DonorListPageState extends State<DonorListPage> {
   }
 
   Widget _filterChip({required String label, required IconData icon, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Color(0xFFEF4444),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 16, color: Colors.white),
-            SizedBox(width: 6),
-            Text(label, style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white)),
-            SizedBox(width: 4),
-            Icon(Icons.arrow_drop_down, size: 18, color: Colors.white),
-          ],
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Color(0xFFEF4444),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, size: 16, color: Colors.white),
+              SizedBox(width: 6),
+              Text(label, style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white)),
+              SizedBox(width: 4),
+              Icon(Icons.arrow_drop_down, size: 18, color: Colors.white),
+            ],
+          ),
         ),
       ),
     );
@@ -520,18 +540,21 @@ class _DonorListPageState extends State<DonorListPage> {
             Wrap(
               spacing: 8, runSpacing: 8,
               children: bloodTypes.map((type) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() => selectedBloodType = type);
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: selectedBloodType == type ? Color(0xFFEF4444) : Colors.grey[100],
-                      borderRadius: BorderRadius.circular(20),
+                return MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() => selectedBloodType = type);
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: selectedBloodType == type ? Color(0xFFEF4444) : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(type, style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500, color: selectedBloodType == type ? Colors.white : Colors.grey[800])),
                     ),
-                    child: Text(type, style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500, color: selectedBloodType == type ? Colors.white : Colors.grey[800])),
                   ),
                 );
               }).toList(),
@@ -555,20 +578,23 @@ class _DonorListPageState extends State<DonorListPage> {
             Text("Select City", style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600)),
             SizedBox(height: 16),
             ...cities.map((city) {
-              return GestureDetector(
-                onTap: () {
-                  setState(() => selectedCity = city);
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[200]!))),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(city, style: GoogleFonts.poppins(fontSize: 14, fontWeight: selectedCity == city ? FontWeight.w600 : FontWeight.normal)),
-                      if (selectedCity == city) Icon(Icons.check, color: Color(0xFFEF4444)),
-                    ],
+              return MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() => selectedCity = city);
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[200]!))),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(city, style: GoogleFonts.poppins(fontSize: 14, fontWeight: selectedCity == city ? FontWeight.w600 : FontWeight.normal)),
+                        if (selectedCity == city) Icon(Icons.check, color: Color(0xFFEF4444)),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -614,27 +640,30 @@ class _DonorListPageState extends State<DonorListPage> {
   }
 
   Widget _filterOption(String title, String value, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.grey[50], borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[200]!),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600])),
-                SizedBox(height: 4),
-                Text(value, style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600)),
-              ],
-            ),
-            Icon(Icons.chevron_right, color: Colors.grey[400]),
-          ],
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey[50], borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[200]!),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600])),
+                  SizedBox(height: 4),
+                  Text(value, style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600)),
+                ],
+              ),
+              Icon(Icons.chevron_right, color: Colors.grey[400]),
+            ],
+          ),
         ),
       ),
     );

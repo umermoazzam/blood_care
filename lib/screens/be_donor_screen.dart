@@ -121,20 +121,16 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // 🔥 CRITICAL FIX: Har baar NAYA unique ID generate karein
-      // .doc() bina parameter ke call karne se Firebase automatically unique ID deta hai
       final docRef = FirebaseFirestore.instance.collection('donors').doc();
       final String uniqueDonorId = docRef.id;
 
       print("🆔 Creating NEW donor with UNIQUE ID: $uniqueDonorId");
       
-      // Current user ka reference (optional - agar user logged in hai)
       final user = FirebaseAuth.instance.currentUser;
       final String? userId = user?.uid;
 
       print("👤 Current User ID (if logged in): $userId");
 
-      // ✅ FIXED: Har registration par NAYA document create hoga
       await docRef.set({
         'name': _nameController.text.trim(),
         'phone': _phoneController.text.trim(),
@@ -148,9 +144,9 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
         'totalDonations': 0,
         'lastDonation': 'Never',
         'registeredAt': FieldValue.serverTimestamp(),
-        'donorId': uniqueDonorId,  // ✅ Unique donor ID
-        'userId': userId,  // ✅ User ID (agar logged in hai)
-        'createdBy': userId ?? 'anonymous',  // ✅ Who created this entry
+        'donorId': uniqueDonorId,
+        'userId': userId,
+        'createdBy': userId ?? 'anonymous',
       });
 
       print("✅ Donor registered successfully with ID: $uniqueDonorId");
@@ -426,22 +422,37 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
   Widget _buildSuccessScreen() {
     return Column(
       children: [
-        const SizedBox(height: 60),
+        const SizedBox(height: 40),
         Container(
-          width: 100,
-          height: 100,
-          decoration: const BoxDecoration(color: Color(0xFF16A34A), shape: BoxShape.circle),
-          child: const Icon(Icons.check, color: Colors.white, size: 60),
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            color: const Color(0xFF16A34A),
+            borderRadius: BorderRadius.circular(40),
+          ),
+          child: const Icon(Icons.check, color: Colors.white, size: 48),
         ),
-        const SizedBox(height: 32),
-        Text('Registration Successful!', textAlign: TextAlign.center, style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.w600, color: Colors.black)),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
+        Text(
+          'Registration Successful',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.poppins(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(height: 12),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Text(
-            'Thank you for registering as a blood donor! You are now part of our lifesaving community.',
+            'Thank you for registering as a blood donor.',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey, height: 1.5),
+            style: GoogleFonts.poppins(
+              fontSize: 15,
+              color: Colors.grey[600],
+              height: 1.5,
+            ),
           ),
         ),
         const SizedBox(height: 32),
@@ -449,37 +460,60 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
           margin: const EdgeInsets.symmetric(horizontal: 24),
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: const Color(0xFFFEE2E2),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFFECDD3)),
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[200]!),
           ),
-          child: Column(
+          child: Row(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(color: const Color(0xFFFF5252), borderRadius: BorderRadius.circular(12)),
-                    child: Center(
-                      child: Text(_selectedBloodGroup ?? '', style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEE2E2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    _selectedBloodGroup ?? '',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFFEF4444),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(_nameController.text.trim(), style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black)),
-                      Text(_cityController.text.trim(), style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[700])),
-                    ],
-                  ),
-                ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _nameController.text.trim(),
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _cityController.text.trim(),
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 32),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: SizedBox(
@@ -488,12 +522,18 @@ class _BeDonorScreenState extends State<BeDonorScreen> {
             child: ElevatedButton(
               onPressed: () => Navigator.pop(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF5252),
+                backgroundColor: const Color(0xFFEF4444),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 elevation: 0,
               ),
-              child: Text('Back to Home', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+              child: Text(
+                'Back to Home',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
         ),
